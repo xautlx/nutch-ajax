@@ -43,11 +43,11 @@ It developed and tested with Apache Nutch 2.3, you can try it on other Nutch 2.X
 
 ### 许可说明
 
-* 开源协议
+* Free Open Source
 
 本项目所有代码完整开源，在保留标识本项目来源信息以及保证不对本项目进行非授权的销售行为的前提下，可以以任意方式自由使用：开源、非开源、商业及非商业。
 
-* 收费服务
+* Charge Support Service
 
-如果你希望提供基于Apache Nutch/Solr/Lucene等系列技术的定制的扩展实现/技术咨询服务/毕业设计指导/二次开发项目指导等任何有兴趣的合作形式，可以联系 E-Mail: xautlx@hotmail.com 或 QQ: 2414521719 (加Q请注明：nutch/solr/lucene) 协商收费服务。[上述联系方式恕不直接提供免费的技术咨询类询问，若对项目有任何技术问题或Issue反馈，请直接提交到项目站点提问或Git平台的Issue]
+如果你还有兴趣在Apache Nutch/Solr/Lucene等系列技术的定制的扩展实现/技术咨询服务/毕业设计指导/二次开发项目指导等方面的合作意向，可联系 E-Mail: xautlx@hotmail.com 或 QQ: 2414521719 (加Q请注明：nutch/solr/lucene) 洽谈。[上述联系方式恕不直接提供咨询类询问，若对项目有任何技术问题或Issue反馈，请直接提交到项目站点提问或Git平台的Issue]
  
