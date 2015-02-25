@@ -32,6 +32,9 @@
   <property name="repo.maven.org"
     value="http://repo1.maven.org/maven2/"
     override="false"/>
+ <property name="maven.oschina.net"
+    value="http://maven.oschina.net/content/groups/public/"
+    override="false"/>     
   <property name="repository.apache.org"
     value="https://repository.apache.org/content/repositories/snapshots/"
     override="false"/>
@@ -48,6 +51,11 @@
       pattern="${maven2.pattern.ext}"
       m2compatible="true"
       />
+     <ibiblio name="oschina"
+      root="${maven.oschina.net}"
+      pattern="${maven2.pattern.ext}"
+      m2compatible="true"
+      />       
     <ibiblio name="apache-snapshot"
       root="${repository.apache.org}"
       changingPattern=".*-SNAPSHOT"
@@ -66,6 +74,9 @@
      
     <chain name="default" dual="true">
       <resolver ref="local"/>
+      <!-- 如果maven官方资源库访问很慢，可以考虑取消此段注释访问国内镜像
+      <resolver ref="oschina"/>
+      -->
       <resolver ref="maven2"/>
       <resolver ref="sonatype"/>
       <resolver ref="apache-snapshot"/>
@@ -74,6 +85,7 @@
       <resolver ref="local"/>
     </chain>
     <chain name="external">
+      <resolver ref="oschina"/>
       <resolver ref="maven2"/>
       <resolver ref="sonatype"/>
     </chain>
