@@ -1,0 +1,6 @@
+/apache-tomcat-7.0.57-solr-4.10.3/work
+/apache-tomcat-7.0.57-solr-4.10.3/logs
+/apache-tomcat-7.0.57-solr-4.10.3/bin/logs
+/apache-nutch-2.3/avrostore
+/apache-nutch-2.3/build
+/apache-nutch-2.3/*.log
