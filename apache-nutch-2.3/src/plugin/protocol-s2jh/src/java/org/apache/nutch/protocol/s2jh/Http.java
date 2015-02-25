@@ -36,6 +36,11 @@ import org.slf4j.LoggerFactory;
 
 import crawlercommons.robots.BaseRobotRules;
 
+/**
+ * 
+ * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ *
+ */
 public class Http extends HttpBase {
 
     public static final Logger LOG = LoggerFactory.getLogger(Http.class);

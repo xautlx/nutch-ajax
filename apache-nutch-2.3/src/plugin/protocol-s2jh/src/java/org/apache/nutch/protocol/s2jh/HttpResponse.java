@@ -68,6 +68,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  * First, try to use basic HTTP Socket to fetch page content, if we don't get expected content, continue,
  * Second, try to use Htmlunit to fetch page content, if we don't get expected content, continue,
  * Third, try to use Selenium WebDriver to fetch page content
+ * 
+ * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
  */
 public class HttpResponse implements Response {
 
