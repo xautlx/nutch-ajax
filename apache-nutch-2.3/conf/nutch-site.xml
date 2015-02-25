@@ -5,4 +5,125 @@
 
 <configuration>
 
+    <!--  -->
+	<property>
+		<name>plugin.folders</name>
+		<value>./src/plugin</value>
+	</property>
+
+
+	<property>
+		<name>plugin.includes</name>
+		<value>protocol-s2jh|urlfilter-regex|parse-(html|s2jh)|index-(basic|anchor)|indexer-solr
+		</value>
+		<description>Regular expression naming plugin directory names to
+			include. Any plugin not matching this expression is
+			excluded.
+			In any case you need at least include the nutch-extensionpoints plugin. By
+			default Nutch includes crawling
+			just HTML and plain text via HTTP,
+			and basic indexing and search plugins. In order to use HTTPS please enable
+			protocol-httpclient, but be aware of possible intermittent problems with the
+			underlying commons-httpclient library.
+		</description>
+	</property>
+
+	<property>
+		<name>fetcher.parse</name>
+		<value>true</value>
+		<description>If true, fetcher will parse content. NOTE: previous releases would
+			default to true. Since 2.0 this is set
+			to false as a safer default.
+		</description>
+	</property>
+
+	<property>
+		<name>http.content.limit</name>
+		<value>-1</value>
+		<description>The length limit for downloaded content using the http
+			protocol, in bytes. If this value is nonnegative
+			(>=0), content longer
+			than it will be truncated; otherwise, no truncation at all. Do not
+			confuse this setting with the
+			file.content.limit setting.
+		</description>
+	</property>
+
+	<property>
+		<name>parser.timeout</name>
+		<value>-1</value>
+		<description>Debugging takes time, esp. when inspecting variables, stack traces, etc. Usually too much time, so that
+			some timeout will apply and stop the application. Set timeouts in the nutch-site.xml used for debugging to a rather
+			high value (or -1 for unlimited), e.g., when debugging the parser.
+		</description>
+	</property>
+
+	<property>
+		<name>http.agent.name</name>
+		<value>Your Nutch Spider</value>
+	</property>
+
+	<property>
+		<name>http.accept.language</name>
+		<value>ja-jp, en-us,en-gb,en;q=0.7,*;q=0.3</value>
+		<description>Value of the “Accept-Language” request header field.
+			This allows selecting non-English language as default
+			one to retrieve.
+			It is a useful setting for search engines build for certain national group.
+		</description>
+	</property>
+
+	<property>
+		<name>parser.character.encoding.default</name>
+		<value>utf-8</value>
+		<description>The character encoding to fall back to when no other information
+			is available
+		</description>
+	</property>
+
+	<property>
+		<name>storage.data.store.class</name>
+		<value>org.apache.gora.mongodb.store.MongoStore</value>
+		<description>Default class for storing data</description>
+	</property>
+
+    <!-- Custom proerties -->
+	<property>
+		<name>parse.data.persist.mode</name>
+		<value>mongodb</value>
+		<description>
+			println: Just System.out.println
+			jdbc: Persist to Database by JDBC
+			mongodb: Persist to MongoDB
+		</description>
+	</property>
+	<property>
+		<name>jdbc.driver</name>
+		<value>com.mysql.jdbc.Driver</value>
+	</property>
+	<property>
+		<name>jdbc.url</name>
+		<value>jdbc:mysql://localhost:3306/nutch?useUnicode=true&amp;characterEncoding=UTF-8</value>
+	</property>
+	<property>
+		<name>jdbc.username</name>
+		<value>root</value>
+	</property>
+	<property>
+		<name>jdbc.password</name>
+		<value></value>
+	</property>
+
+	<property>
+		<name>mongodb.host</name>
+		<value>127.0.0.1</value>
+	</property>
+	<property>
+		<name>mongodb.port</name>
+		<value>27017</value>
+	</property>
+	<property>
+		<name>mongodb.db</name>
+		<value>nutch</value>
+	</property>
 </configuration>
