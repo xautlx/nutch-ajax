@@ -27,11 +27,11 @@ It developed and tested with Apache Nutch 2.3, you can try it on other Nutch 2.X
 
 同时工程代码中提交了Eclipse的工程配置文件，可以直接import Eclipse中Run或Debug运行，Nutch工程以Ivy进行依赖管理，可采用ANT Build方式或建议在Eclipse IDE安装Apache Ivy IDE插件进行工程编译运行。
 
-![snapshot](https://github.com/xautlx/nutch-ajax/blob/master/snapshot/eclipse-run.jpg)
+![snapshot](http://git.oschina.net/xautlx/nutch-ajax/raw/master/snapshot/eclipse-run.jpg)
 
-![snapshot](https://github.com/xautlx/nutch-ajax/blob/master/snapshot/storage-data.jpg)
+![snapshot](http://git.oschina.net/xautlx/nutch-ajax/raw/master/snapshot/storage-data.jpg)
 
-![snapshot](https://github.com/xautlx/nutch-ajax/blob/master/snapshot/parse-data.jpg)
+![snapshot](http://git.oschina.net/xautlx/nutch-ajax/raw/master/snapshot/parse-data.jpg)
 
 ### 扩展插件说明
 
