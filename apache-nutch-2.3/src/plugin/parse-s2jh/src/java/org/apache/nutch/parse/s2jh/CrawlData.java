@@ -7,6 +7,11 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+/**
+ * 
+ * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ *
+ */
 public class CrawlData implements Serializable {
 
     private static final long serialVersionUID = -2670885640064330298L;

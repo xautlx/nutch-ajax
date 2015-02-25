@@ -15,6 +15,8 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 /**
  * Htmlunit WebClient Helper
  * Use one WebClient instance per thread by ThreadLocal to support multiple threads execution
+ * 
+ * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
  */
 public class HttpWebClient {
 

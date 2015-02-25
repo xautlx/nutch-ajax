@@ -12,6 +12,11 @@ import org.w3c.dom.DocumentFragment;
 
 import com.google.common.collect.Lists;
 
+/**
+ * 
+ * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ *
+ */
 public class TMallHtmlParseFilter extends AbstractHtmlParseFilter {
 
     public static final Logger LOG = LoggerFactory.getLogger(TMallHtmlParseFilter.class);

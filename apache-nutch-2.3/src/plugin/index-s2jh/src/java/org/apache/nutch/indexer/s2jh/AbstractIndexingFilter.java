@@ -10,6 +10,11 @@ import org.apache.nutch.storage.WebPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ *
+ */
 public abstract class AbstractIndexingFilter implements IndexingFilter {
 
     public static final Logger LOG = LoggerFactory.getLogger(AbstractIndexingFilter.class);

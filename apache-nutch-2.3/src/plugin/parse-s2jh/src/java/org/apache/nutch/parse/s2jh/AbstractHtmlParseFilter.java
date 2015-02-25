@@ -41,6 +41,11 @@ import com.mongodb.DBCollection;
 import com.mongodb.MongoClient;
 import com.sun.org.apache.xpath.internal.XPathAPI;
 
+/**
+ * 
+ * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ *
+ */
 public abstract class AbstractHtmlParseFilter implements ParseFilter {
 
     public static final Logger LOG = LoggerFactory.getLogger(AbstractHtmlParseFilter.class);

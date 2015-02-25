@@ -24,6 +24,8 @@ import com.gargoylesoftware.htmlunit.WebResponse;
  * Default htmlunit will request all parsed HTTP requests (html, js, css, etc.)
  * But only a few requests used for parse specified information,
  * So introduce urlfilter support configurable htmlunit HTTP request list.
+ * 
+ * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
  */
 public class RegexHttpWebConnection extends HttpWebConnection {
 
