@@ -1028,6 +1028,11 @@
         <source path="${basedir}/src/plugin/urlnormalizer-regex/src/java/" />
         <source path="${basedir}/src/plugin/urlnormalizer-regex/src/test/" />
 
+      	<source path="${basedir}/src/plugin/lib-htmlunit/src/java/" />
+      	<source path="${basedir}/src/plugin/protocol-s2jh/src/java/" />
+      	<source path="${basedir}/src/plugin/parse-s2jh/src/java/" />
+      	<source path="${basedir}/src/plugin/index-s2jh/src/java/" />
+      	
         <output path="${basedir}/build/classes" />
       </classpath>
     </eclipse>
