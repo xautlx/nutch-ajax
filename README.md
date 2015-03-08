@@ -35,6 +35,8 @@ It developed and tested with Apache Nutch 2.3, you can try it on other Nutch 2.X
 
 ### 扩展插件说明
 
+* **lib-htmlunit**: 基于Htmlunit的多线程处理，缓存控制，请求正则控制等特性扩展插件
+
 * **protocol-s2jh**: 基于Htmlunit和Selenium WebDriver实现的AJAX页面Fetcher插件
 
 * **parse-s2jh**: 基于XPath解析页面元素内容; 持久化解析到的结构化数据，如MySQL，MongoDB等; 对于个别复杂类型AJAX页面定制判断页面加载完成的回调判断逻辑
@@ -45,12 +47,12 @@ It developed and tested with Apache Nutch 2.3, you can try it on other Nutch 2.X
 
 * Free Open Source
 
-本项目所有代码完整开源，在保留标识本项目来源信息以及保证不对本项目进行非授权的销售行为的前提下，可以以任意方式自由使用：开源、非开源、商业及非商业。
+本项目所有代码完整开源，在保留标识本项目来源信息以及保证不对本项目进行非授权的销售行为的前提下，可以以任意方式自由免费使用：开源、非开源、商业及非商业。
 
 * Charge Support Service
 
-如果你还有兴趣在Apache Nutch/Solr/Lucene等系列技术的定制的扩展实现/技术咨询服务/毕业设计指导/二次开发项目指导等方面的合作意向，可联系 E-Mail: xautlx@hotmail.com 或 QQ: 2414521719 (加Q请注明：nutch/solr/lucene) 洽谈。[上述联系方式恕不直接提供咨询类询问，若对项目有任何技术问题或Issue反馈，请直接提交到项目站点提问或Git平台的Issue]
- 
+如果你还有兴趣在Apache Nutch/Solr/Lucene等系列技术的定制的扩展实现/技术咨询服务/毕业设计指导/二次开发项目指导等方面的合作意向，可联系 E-Mail: s2jh-dev@hotmail.com 或 QQ: 2414521719 (加Q请注明：nutch/solr/lucene) 洽谈。[上述联系方式恕不直接提供咨询类询问，为了提升项目活跃度，若对项目有任何技术问题或Issue反馈，请直接提交到项目站点提问或Git平台的Issue]
+
 ### Reference
 
 欢迎关注作者其他项目：
