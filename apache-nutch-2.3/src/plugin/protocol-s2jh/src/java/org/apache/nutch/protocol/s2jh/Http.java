@@ -38,12 +38,14 @@ import crawlercommons.robots.BaseRobotRules;
 
 /**
  * 
- * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ * @author EMAIL:s2jh-dev@hotmail.com , QQ:2414521719
  *
  */
 public class Http extends HttpBase {
 
     public static final Logger LOG = LoggerFactory.getLogger(Http.class);
+
+    public static final Logger LOG_HTML = LoggerFactory.getLogger("org.apache.nutch.protocol.s2jh.html");
 
     private static final Collection<WebPage.Field> FIELDS = new HashSet<WebPage.Field>();
 
