@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="lib" path="conf"/>
 	<classpathentry kind="src" path="src/plugin/lib-htmlunit/src/java"/>
+	<classpathentry kind="src" path="src/plugin/lib-pinyin/src/java"/>
 	<classpathentry kind="src" path="src/plugin/protocol-s2jh/src/java"/>
 	<classpathentry kind="src" path="src/plugin/parse-s2jh/src/java"/>
 	<classpathentry kind="src" path="src/plugin/index-s2jh/src/java"/>
