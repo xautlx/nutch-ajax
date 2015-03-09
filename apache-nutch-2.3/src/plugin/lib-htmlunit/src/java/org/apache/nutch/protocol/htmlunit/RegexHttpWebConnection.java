@@ -3,7 +3,6 @@ package org.apache.nutch.protocol.htmlunit;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,16 +24,13 @@ import com.gargoylesoftware.htmlunit.WebResponse;
  * But only a few requests used for parse specified information,
  * So introduce urlfilter support configurable htmlunit HTTP request list.
  * 
- * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ * @author EMAIL:s2jh-dev@hotmail.com , QQ:2414521719
  */
 public class RegexHttpWebConnection extends HttpWebConnection {
 
     public static final Logger LOG = LoggerFactory.getLogger(RegexHttpWebConnection.class);
 
     public static final Logger FILE_LOG = LoggerFactory.getLogger("file");
-
-    public static final String URLFILTER_REGEX_FILE = "urlfilter.regex.file";
-    public static final String URLFILTER_REGEX_RULES = "urlfilter.regex.rules";
 
     /** An array of applicable rules */
     private List<Rule> rules;
@@ -85,12 +81,7 @@ public class RegexHttpWebConnection extends HttpWebConnection {
      * as a config file.
      */
     protected Reader getRulesReader(Configuration conf) throws IOException {
-        String stringRules = conf.get(URLFILTER_REGEX_RULES);
-        if (stringRules != null) {
-            return new StringReader(stringRules);
-        }
-        String fileRules = conf.get(URLFILTER_REGEX_FILE);
-        return conf.getConfResourceAsReader(fileRules);
+        return conf.getConfResourceAsReader("htmlunit-urlfilter.txt");
     }
 
     protected Rule createRule(boolean sign, String regex) {

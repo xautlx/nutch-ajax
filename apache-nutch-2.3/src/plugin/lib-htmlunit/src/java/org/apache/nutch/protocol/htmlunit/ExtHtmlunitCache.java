@@ -8,9 +8,11 @@ import com.gargoylesoftware.htmlunit.WebResponse;
 /**
  * Add Cache-Control header info process for htmlunit cache
  * 
- * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ * @author EMAIL:s2jh-dev@hotmail.com , QQ:2414521719
  */
 public class ExtHtmlunitCache extends Cache {
+
+    private static final long serialVersionUID = 5481919471569877756L;
 
     protected boolean isDynamicContent(final WebResponse response) {
         final String cacheControl = response.getResponseHeaderValue("Cache-Control");

@@ -16,7 +16,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  * Htmlunit WebClient Helper
  * Use one WebClient instance per thread by ThreadLocal to support multiple threads execution
  * 
- * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ * @author EMAIL:s2jh-dev@hotmail.com , QQ:2414521719
  */
 public class HttpWebClient {
 
@@ -45,7 +45,7 @@ public class HttpWebClient {
                     // Use extension version htmlunit cache process
                     webClient.setCache(new ExtHtmlunitCache());
                     // Enhanced WebConnection based on urlfilter
-                    webClient.setWebConnection(new RegexHttpWebConnection(webClient));
+                    webClient.setWebConnection(new RegexHttpWebConnection(webClient, conf));
                     webClient.waitForBackgroundJavaScript(600 * 1000);
                     //设置足够高度以支持一些需要页面内容多需屏幕滚动显示的页面
                     webClient.getCurrentWindow().setInnerHeight(6000);
@@ -65,32 +65,4 @@ public class HttpWebClient {
     public static HtmlPage getHtmlPage(String url) {
         return getHtmlPage(url, null);
     }
-
-    public static WebClient buildWebClient() {
-        WebClient webClient = threadWebClient.get();
-        if (webClient == null) {
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Building WebClient for Thread: {}", Thread.currentThread().getId());
-            }
-            synchronized (threadWebClient) {
-
-                webClient = new WebClient(BrowserVersion.CHROME);
-                webClient.getOptions().setCssEnabled(true);
-                webClient.getOptions().setAppletEnabled(false);
-                webClient.getOptions().setThrowExceptionOnScriptError(false);
-                // AJAX support
-                webClient.setAjaxController(new NicelyResynchronizingAjaxController());
-                // Use extension version htmlunit cache process
-                webClient.setCache(new ExtHtmlunitCache());
-                // Enhanced WebConnection based on urlfilter
-                webClient.setWebConnection(new RegexHttpWebConnection(webClient));
-                webClient.waitForBackgroundJavaScript(600 * 1000);
-                //设置足够高度以支持一些需要页面内容多需屏幕滚动显示的页面
-                webClient.getCurrentWindow().setInnerHeight(6000);
-                threadWebClient.set(webClient);
-            }
-        }
-        return webClient;
-    }
-
 }
