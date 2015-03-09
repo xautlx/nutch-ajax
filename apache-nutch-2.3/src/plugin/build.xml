@@ -69,6 +69,7 @@
      <ant dir="parse-zip" target="deploy"/>
      -->
   	
+  	<ant dir="lib-pinyin" target="deploy" />
   	<ant dir="parse-s2jh" target="deploy" />
 	<ant dir="lib-htmlunit" target="deploy" />
   	<ant dir="protocol-s2jh" target="deploy" />
@@ -112,6 +113,7 @@
      <ant dir="parse-zip" target="test"/>
       -->
   	
+  	<ant dir="lib-pinyin" target="test" />
   	<ant dir="parse-s2jh" target="test" />
 	<ant dir="lib-htmlunit" target="test" />
   	<ant dir="protocol-s2jh" target="test" />
@@ -163,6 +165,7 @@
     <ant dir="urlnormalizer-pass" target="clean"/>
     <ant dir="urlnormalizer-regex" target="clean"/>
   	
+  	<ant dir="lib-pinyin" target="clean" />
   	<ant dir="parse-s2jh" target="clean" />
 	<ant dir="lib-htmlunit" target="clean" />
   	<ant dir="protocol-s2jh" target="clean" />
