@@ -14,7 +14,7 @@ import com.google.common.collect.Lists;
 
 /**
  * 
- * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ * @author EMAIL:s2jh-dev@hotmail.com , QQ:2414521719
  *
  */
 public class TMallHtmlParseFilter extends AbstractHtmlParseFilter {
@@ -23,17 +23,10 @@ public class TMallHtmlParseFilter extends AbstractHtmlParseFilter {
 
     @Override
     public Parse filterInternal(String url, WebPage page, Parse parse, HTMLMetaTags metaTags, DocumentFragment doc) {
-
-        try {
-
-        } catch (Exception e) {
-            LOG.error(e.getMessage(), e);
-        }
-
         List<CrawlData> crawlDatas = Lists.newArrayList();
 
-        crawlDatas.add(new CrawlData(url, "title", "商品名称").setTextValue(getXPathValue(doc, "//DIV[@class='tb-detail-hd']/H1")));
-        crawlDatas.add(new CrawlData(url, "tm-price", "价格区间").setTextValue(getXPathValue(doc, "//SPAN[@class='tm-price']")));
+        crawlDatas.add(new CrawlData(url, "title", "商品名称").setTextValue(getXPathValue(doc, "//DIV[@class='tb-detail-hd']/H1"), page));
+        crawlDatas.add(new CrawlData(url, "price", "价格区间").setTextValue(getXPathValue(doc, "//SPAN[@class='tm-price']"), page));
         crawlDatas.add(new CrawlData(url, "description", "描述HTML").setHtmlValue(getXPathHtml(doc, "//DIV[@id='description']")));
 
         saveCrawlData(url, crawlDatas);

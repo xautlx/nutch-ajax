@@ -29,9 +29,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,12 +43,7 @@ import org.apache.nutch.metadata.Metadata;
 import org.apache.nutch.metadata.SpellCheckedMetadata;
 import org.apache.nutch.net.protocols.HttpDateFormat;
 import org.apache.nutch.net.protocols.Response;
-import org.apache.nutch.parse.ParseFilter;
 import org.apache.nutch.parse.s2jh.AbstractHtmlParseFilter;
-import org.apache.nutch.plugin.Extension;
-import org.apache.nutch.plugin.ExtensionPoint;
-import org.apache.nutch.plugin.PluginRepository;
-import org.apache.nutch.plugin.PluginRuntimeException;
 import org.apache.nutch.protocol.ProtocolException;
 import org.apache.nutch.protocol.htmlunit.HttpWebClient;
 import org.apache.nutch.protocol.http.api.HttpBase;
@@ -69,7 +62,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
  * Second, try to use Htmlunit to fetch page content, if we don't get expected content, continue,
  * Third, try to use Selenium WebDriver to fetch page content
  * 
- * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ * @author EMAIL:s2jh-dev@hotmail.com , QQ:2414521719
  */
 public class HttpResponse implements Response {
 
@@ -81,9 +74,6 @@ public class HttpResponse implements Response {
     private final Metadata headers = new SpellCheckedMetadata();
 
     private String charset;
-    // 获取解析过滤器集合，用于过滤链回调判断页面加载完成
-    private static AbstractHtmlParseFilter[] parseFilters;
-    public static final String HTMLPARSEFILTER_ORDER = "htmlparsefilter.order";
 
     protected enum Scheme {
         HTTP, HTTPS,
@@ -227,48 +217,6 @@ public class HttpResponse implements Response {
                 haveSeenNonContinueStatus = code != 100; // 100 is "Continue"
             }
 
-            //Prepare  parseFilters
-            String order = conf.get(HTMLPARSEFILTER_ORDER);
-            if (parseFilters == null) {
-                /*
-                 * If ordered filters are required, prepare array of filters based on
-                 * property
-                 */
-                String[] orderedFilters = null;
-                if (order != null && !order.trim().equals("")) {
-                    orderedFilters = order.split("\\s+");
-                }
-                HashMap<String, AbstractHtmlParseFilter> filterMap = new HashMap<String, AbstractHtmlParseFilter>();
-                try {
-                    ExtensionPoint point = PluginRepository.get(conf).getExtensionPoint(ParseFilter.X_POINT_ID);
-                    if (point == null)
-                        throw new RuntimeException(ParseFilter.X_POINT_ID + " not found.");
-                    Extension[] extensions = point.getExtensions();
-                    for (int i = 0; i < extensions.length; i++) {
-                        Extension extension = extensions[i];
-                        ParseFilter parseFilter = (ParseFilter) extension.getExtensionInstance();
-                        if (parseFilter instanceof AbstractHtmlParseFilter) {
-                            if (!filterMap.containsKey(parseFilter.getClass().getName())) {
-                                filterMap.put(parseFilter.getClass().getName(), (AbstractHtmlParseFilter) parseFilter);
-                            }
-                        }
-                    }
-                    parseFilters = filterMap.values().toArray(new AbstractHtmlParseFilter[filterMap.size()]);
-                    if (orderedFilters != null) {
-                        ArrayList<ParseFilter> filters = new ArrayList<ParseFilter>();
-                        for (int i = 0; i < orderedFilters.length; i++) {
-                            ParseFilter filter = filterMap.get(orderedFilters[i]);
-                            if (filter != null) {
-                                filters.add(filter);
-                            }
-                        }
-                        parseFilters = filters.toArray(new AbstractHtmlParseFilter[filters.size()]);
-                    }
-                } catch (PluginRuntimeException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
             if (!url.toString().endsWith("robots.txt")) {
                 if (readPlainContent(url.toString(), in)) {
                 } else if (readPlainContentByHtmlunit(url)) {
@@ -280,7 +228,7 @@ public class HttpResponse implements Response {
             if (content != null && content.length > 0) {
                 String html = charset == null ? new String(content) : new String(content, charset);
                 //System.out.println("URL: " + url + ", CharsetName: " + charset + " , Page HTML=\n" + html);
-                Http.LOG.trace("URL: " + url + ", CharsetName: " + charset + " , Page HTML=\n" + html);
+                Http.LOG_HTML.trace("URL: " + url + ", CharsetName: " + charset + " , Page HTML=\n" + html);
             }
 
             // add headers in metadata to row
@@ -329,6 +277,10 @@ public class HttpResponse implements Response {
     private static final int MAX_AJAX_WAIT_SECONDS = 20;
 
     private boolean readPlainContent(String urlStr, InputStream in) throws Exception {
+        boolean forceAjax = conf.getBoolean("fetch.force.ajax.support", true);
+        if (forceAjax) {
+            return false;
+        }
         if (urlStr.indexOf("detail.tmall.com") > -1) {
             return false;
         }
@@ -441,22 +393,29 @@ public class HttpResponse implements Response {
         boolean ok = true;
 
         //除绝大部分AJAX页面都能被htmlunit正常解析，个别网站采用的JS技术比较另类导致无法解析则退回采用效率稍低的selenium2获取最终内容
-        WebDriver driver = new FirefoxDriver();
-        driver.get(url.toString());
+        WebDriver driver = null;
+        try {
+            driver = new FirefoxDriver();
+            driver.get(url.toString());
 
-        int i = 0;
-        while (i++ < MAX_AJAX_WAIT_SECONDS) {
-            html = driver.getPageSource().trim();
-            ok = isParseDataFetchLoaded(urlStr, html);
-            if (ok) {
-                break;
+            int i = 0;
+            while (i++ < MAX_AJAX_WAIT_SECONDS) {
+                html = driver.getPageSource().trim();
+                ok = isParseDataFetchLoaded(urlStr, html);
+                if (ok) {
+                    break;
+                }
+                //触发页面滚动
+                ((JavascriptExecutor) driver).executeScript("scroll(0," + (i * 500) + ");");
+                Http.LOG.info("Sleep " + i + " seconds to wait WebDriver execution...");
+                Thread.sleep(1000);
             }
-            //触发页面滚动
-            ((JavascriptExecutor) driver).executeScript("scroll(0," + (i * 500) + ");");
-            Http.LOG.info("Sleep " + i + " seconds to wait WebDriver execution...");
-            Thread.sleep(1000);
+        } finally {
+            //Ensure driver quit
+            if (driver != null) {
+                driver.quit();
+            }
         }
-        driver.close();
 
         if (ok) {
             Http.LOG.debug("Success parse page by WebDriver  for: {}", url);
@@ -475,6 +434,7 @@ public class HttpResponse implements Response {
      */
     private boolean isParseDataFetchLoaded(String url, String html) {
         boolean ok = true;
+        AbstractHtmlParseFilter[] parseFilters = AbstractHtmlParseFilter.getParseFilters(conf);
         if (parseFilters != null) {
             for (AbstractHtmlParseFilter htmlParseFilter : parseFilters) {
                 Boolean ret = htmlParseFilter.isParseDataFetchLoaded(url, html);

@@ -15,27 +15,21 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<!--
+ ! A common framework for http protocol implementations
+ !-->
 <plugin
-   id="index-s2jh"
-   name="S2JH Indexing Filter"
-   version="1.0.0"
-   provider-name="lab.s2jh">
+   id="lib-pinyin"
+   name="Utils for transform Chinese to Pinyin"
+   version="1.0"
+   provider-name="org.apache.nutch">
 
-    <runtime>
-      <library name="index-s2jh.jar">
-         <export name="*"/>
-      </library>
+   <runtime>
+     <library name="lib-pinyin.jar">
+        <export name="*"/>
+     </library>      
    </runtime>
 
    <requires>
-      <import plugin="nutch-extensionpoints"/>
-      <import plugin="lib-pinyin"/>
    </requires>
-
-   <extension id="org.apache.nutch.indexer.s2jh"
-              name="Nutch Basic Indexing Filter"
-              point="org.apache.nutch.indexer.IndexingFilter">
-      <implementation id="s2jhIndexingFilter"
-                      class="org.apache.nutch.indexer.s2jh.S2jhIndexingFilter"/>                
-   </extension> 
 </plugin>

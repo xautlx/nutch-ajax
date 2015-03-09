@@ -5,10 +5,11 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
@@ -23,6 +24,10 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.nutch.parse.HTMLMetaTags;
 import org.apache.nutch.parse.Parse;
 import org.apache.nutch.parse.ParseFilter;
+import org.apache.nutch.plugin.Extension;
+import org.apache.nutch.plugin.ExtensionPoint;
+import org.apache.nutch.plugin.PluginRepository;
+import org.apache.nutch.plugin.PluginRuntimeException;
 import org.apache.nutch.storage.WebPage;
 import org.apache.nutch.storage.WebPage.Field;
 import org.apache.nutch.util.StringUtil;
@@ -43,7 +48,7 @@ import com.sun.org.apache.xpath.internal.XPathAPI;
 
 /**
  * 
- * @author EMAIL:xautlx@hotmail.com , QQ:2414521719
+ * @author EMAIL:s2jh-dev@hotmail.com , QQ:2414521719
  *
  */
 public abstract class AbstractHtmlParseFilter implements ParseFilter {
@@ -222,7 +227,7 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
         LOG.debug("Invoking parse  {} for url: {}", this.getClass().getName(), url);
         try {
             //URL匹配
-            if (filterPattern != null && !filterPattern.matcher(url).find()) {
+            if (!isUrlMatchedForParse(url)) {
                 LOG.debug("Skipped {} as not match regex [{}]", this.getClass().getName(), getUrlFilterRegex());
                 return parse;
             }
@@ -248,7 +253,8 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
             if (LOG.isInfoEnabled()) {
                 long elapsed = (System.currentTimeMillis() - start) / 1000;
                 float avgPagesSec = (float) pages.get() / elapsed;
-                LOG.info(" - Custom prased total " + pages.get() + " pages, " + elapsed + " seconds, avg " + avgPagesSec + " pages/s");
+                LOG.info(" - Custom prased total " + pages.get() + " pages, " + elapsed + " seconds, avg "
+                        + avgPagesSec + " pages/s");
             }
             return parse;
         } catch (Exception e) {
@@ -257,6 +263,25 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
         return null;
     }
 
+    /**
+     * 初始化属性记录表的DDL脚本（MySQL版本）：
+
+    CREATE TABLE `crawl_data` (
+    `url` varchar(255) NOT NULL,
+    `code` varchar(255) NOT NULL,
+    `name` varchar(255) DEFAULT NULL,
+    `category` varchar(255) DEFAULT NULL,
+    `order_index` int(255) DEFAULT NULL,
+    `fetch_time` datetime NOT NULL,
+    `text_value` text,
+    `html_value` text,
+    `date_value` datetime DEFAULT NULL,
+    `num_value` decimal(18,4) DEFAULT NULL
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+     * 按照代码纵向存储各属性值，在需要的时候再转成横向，参考SQL脚本：
+     * SELECT url,fetch_time, CASE WHEN  code = 'title'  THEN  text_value ELSE  null  END   AS  `title` FROM crawl_data GROUP BY url,fetch_time
+     */
     private static final String selectSQL = "SELECT count(*) from crawl_data where url=?";
     private static final String deleteSQL = "DELETE from crawl_data where url=?";
     private static final String insertSQL = "INSERT INTO crawl_data(url, code, name, category, order_index, fetch_time, text_value, html_value,date_value, num_value) "
@@ -276,7 +301,8 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
             Connection conn = null;
             try {
                 Class.forName(conf.get("jdbc.driver"));
-                conn = DriverManager.getConnection(conf.get("jdbc.url"), conf.get("jdbc.username"), conf.get("jdbc.password"));
+                conn = DriverManager.getConnection(conf.get("jdbc.url"), conf.get("jdbc.username"),
+                        conf.get("jdbc.password"));
                 PreparedStatement selectPS = conn.prepareStatement(selectSQL);
                 selectPS.setString(1, url);
                 ResultSet rs = selectPS.executeQuery();
@@ -344,7 +370,8 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
 
         if ("mongodb".equalsIgnoreCase(persistMode)) {
             try {
-                MongoClient mongoClient = new MongoClient(conf.get("mongodb.host"), Integer.valueOf(conf.get("mongodb.port")));
+                MongoClient mongoClient = new MongoClient(conf.get("mongodb.host"), Integer.valueOf(conf
+                        .get("mongodb.port")));
                 DB db = mongoClient.getDB(conf.get("mongodb.db"));
                 DBCollection coll = db.getCollection("crawl_data");
                 BasicDBObject bo = new BasicDBObject("url", url).append("fetch_time", new Date());
@@ -354,13 +381,7 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
                         LOG.error("Invalid crawlData not match url: {}", url);
                         continue;
                     }
-                    Map<String, Object> data = crawlData.getMapValue();
-                    LOG.debug(" - {} : {}", crawlData.getKey(), data);
-                    if (data.size() == 1) {
-                        bo.append(crawlData.getKey(), crawlData.getMapValue().entrySet().iterator().next().getValue());
-                    } else {
-                        bo.append(crawlData.getKey(), crawlData.getMapValue());
-                    }
+                    bo.append(crawlData.getKey(), crawlData.getValue());
                 }
                 coll.update(new BasicDBObject("url", url), bo, true, false);
                 mongoClient.close();
@@ -373,6 +394,71 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
     @Override
     public Collection<Field> getFields() {
         return null;
+    }
+
+    // 获取解析过滤器集合，用于过滤链回调判断页面加载完成
+    private static AbstractHtmlParseFilter[] parseFilters;
+    public static final String HTMLPARSEFILTER_ORDER = "htmlparsefilter.order";
+
+    public static AbstractHtmlParseFilter[] getParseFilters(Configuration conf) {
+        //Prepare  parseFilters
+        String order = conf.get(HTMLPARSEFILTER_ORDER);
+        if (parseFilters == null) {
+            /*
+             * If ordered filters are required, prepare array of filters based on
+             * property
+             */
+            String[] orderedFilters = null;
+            if (order != null && !order.trim().equals("")) {
+                orderedFilters = order.split("\\s+");
+            }
+            HashMap<String, AbstractHtmlParseFilter> filterMap = new HashMap<String, AbstractHtmlParseFilter>();
+            try {
+                ExtensionPoint point = PluginRepository.get(conf).getExtensionPoint(ParseFilter.X_POINT_ID);
+                if (point == null)
+                    throw new RuntimeException(ParseFilter.X_POINT_ID + " not found.");
+                Extension[] extensions = point.getExtensions();
+                for (int i = 0; i < extensions.length; i++) {
+                    Extension extension = extensions[i];
+                    ParseFilter parseFilter = (ParseFilter) extension.getExtensionInstance();
+                    if (parseFilter instanceof AbstractHtmlParseFilter) {
+                        if (!filterMap.containsKey(parseFilter.getClass().getName())) {
+                            filterMap.put(parseFilter.getClass().getName(), (AbstractHtmlParseFilter) parseFilter);
+                        }
+                    }
+                }
+                parseFilters = filterMap.values().toArray(new AbstractHtmlParseFilter[filterMap.size()]);
+                if (orderedFilters != null) {
+                    ArrayList<ParseFilter> filters = new ArrayList<ParseFilter>();
+                    for (int i = 0; i < orderedFilters.length; i++) {
+                        ParseFilter filter = filterMap.get(orderedFilters[i]);
+                        if (filter != null) {
+                            filters.add(filter);
+                        }
+                    }
+                    parseFilters = filters.toArray(new AbstractHtmlParseFilter[filters.size()]);
+                }
+            } catch (PluginRuntimeException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return parseFilters;
+    }
+
+    /**
+     * 判断url是否符合自定义解析匹配规则
+     * @param url
+     * @return
+     */
+    public boolean isUrlMatchedForParse(String url) {
+        if (filterPattern == null) {
+            //没有url控制规则，直接放行
+            return true;
+        }
+        if (filterPattern.matcher(url).find()) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -424,5 +510,6 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
      * 子类实现具体的页面数据解析逻辑
      * @return
      */
-    public abstract Parse filterInternal(String url, WebPage page, Parse parse, HTMLMetaTags metaTags, DocumentFragment doc);
+    public abstract Parse filterInternal(String url, WebPage page, Parse parse, HTMLMetaTags metaTags,
+            DocumentFragment doc);
 }
