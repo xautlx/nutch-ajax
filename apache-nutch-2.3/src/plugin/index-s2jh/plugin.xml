@@ -29,15 +29,13 @@
 
    <requires>
       <import plugin="nutch-extensionpoints"/>
+      <import plugin="lib-pinyin"/>
    </requires>
 
    <extension id="org.apache.nutch.indexer.s2jh"
               name="Nutch Basic Indexing Filter"
               point="org.apache.nutch.indexer.IndexingFilter">
       <implementation id="s2jhIndexingFilter"
-                      class="org.apache.nutch.indexer.s2jh.S2jhIndexingFilter"/>
-                      
-      <implementation id="s2jhDiscardIndexingFilter"
-                      class="org.apache.nutch.indexer.s2jh.S2jhDiscardIndexingFilter"/>                      
+                      class="org.apache.nutch.indexer.s2jh.S2jhIndexingFilter"/>                
    </extension> 
 </plugin>
