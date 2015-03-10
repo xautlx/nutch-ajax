@@ -35,6 +35,8 @@ It developed and tested with Apache Nutch 2.3, you can try it on other Nutch 2.X
 
 ### 扩展插件说明
 
+* **lib-pinyin**: 用于parse或index插件转换中文到拼音提交solr；部署用于solr dataimporthandler组件进行拼音转换的transformer扩展插件
+
 * **lib-htmlunit**: 基于Htmlunit的多线程处理，缓存控制，请求正则控制等特性扩展插件
 
 * **protocol-s2jh**: 基于Htmlunit和Selenium WebDriver实现的AJAX页面Fetcher插件
