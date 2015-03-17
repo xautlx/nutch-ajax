@@ -19,4 +19,19 @@
 
   <import file="../build-plugin.xml"/>
 
+  <target name="deps-jar">
+    <ant target="jar" inheritall="false" dir="../lib-pinyin"/>
+  	<!-- <ant target="jar" inheritall="false" dir="../lib-htmlunit"/> -->
+  	<ant target="jar" inheritall="false" dir="../parse-s2jh"/>
+  </target>
+
+  <!-- Add compilation dependencies to classpath -->
+  <path id="plugin.deps">
+    <fileset dir="${nutch.root}/build">
+      <include name="**/lib-pinyin/*.jar" />
+<!--       <include name="**/lib-htmlunit/*.jar" />
+ -->      <include name="**/parse-s2jh/*.jar" />
+    </fileset>
+  </path>
+
 </project>
