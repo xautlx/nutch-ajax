@@ -1,0 +1,14 @@
+/contexts/
+/etc/
+/example-DIH/
+/example-schemaless/
+/exampledocs/
+/lib/
+/multicore/
+/resources/
+/scripts/
+/webapps/
+/README.txt
+/start.jar
+/logs/
+/solr-webapp/

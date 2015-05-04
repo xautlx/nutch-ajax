@@ -1,0 +1,60 @@
+<!-- 
+
+CREATE TABLE `domain_groups` (
+  `domain` varchar(128) NOT NULL,
+  `group_code` varchar(128) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ -->
+
+<dataConfig>
+	<dataSource driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost:3306/nutch?useUnicode=true&amp;characterEncoding=UTF-8"
+		user="root" />
+
+	<script><![CDATA[
+		var atomicTransformer = function (row) {
+		    var setMap = new java.util.HashMap();
+		    setMap.put('set',row.get('update_time'));
+		    row.put('groupUpdatetime',setMap);
+		    return row;
+		};
+    ]]>
+	</script>
+
+	<document>
+
+		<entity name="item" transformer="script:atomicTransformer,org.apache.solr.transformer.ChineseToPinyinTransformer"
+			query="SELECT url as id , 
+				        GROUP_CONCAT(CASE WHEN  code = 'domain'  THEN  text_value ELSE  null  END)   AS  `domain`,
+				        GROUP_CONCAT(CASE WHEN  code = 'name'  THEN  text_value ELSE  null  END)   AS  `name`,
+				        GROUP_CONCAT(CASE WHEN  code = 'brand'  THEN  text_value ELSE  null  END)   AS  `brand`,
+				        GROUP_CONCAT(CASE WHEN  code = 'category'  THEN  text_value ELSE  null  END)   AS  `category`,
+				        GROUP_CONCAT(CASE WHEN  code = 'purpose'  THEN  text_value ELSE  null  END)   AS  `purpose`,
+				        GROUP_CONCAT(CASE WHEN  code = 'price'  THEN  num_value ELSE  null  END)   AS  `price`,
+				        GROUP_CONCAT(CASE WHEN  code = 'refPrice'  THEN  num_value ELSE  null  END)   AS  `refPrice`,
+				        GROUP_CONCAT(CASE WHEN  code = 'primaryImage'  THEN  text_value ELSE  null  END)   AS  `primaryImage`
+                        FROM crawl_data GROUP BY url"
+			deltaImportQuery="select t.*,g.update_time from (SELECT url as id , 
+				        GROUP_CONCAT(CASE WHEN  code = 'domain'  THEN  text_value ELSE  null  END)   AS  `domain`,
+				        GROUP_CONCAT(CASE WHEN  code = 'name'  THEN  text_value ELSE  null  END)   AS  `name`,
+				        GROUP_CONCAT(CASE WHEN  code = 'brand'  THEN  text_value ELSE  null  END)   AS  `brand`,
+				        GROUP_CONCAT(CASE WHEN  code = 'category'  THEN  text_value ELSE  null  END)   AS  `category`,
+				        GROUP_CONCAT(CASE WHEN  code = 'purpose'  THEN  text_value ELSE  null  END)   AS  `purpose`,
+				        GROUP_CONCAT(CASE WHEN  code = 'price'  THEN  num_value ELSE  null  END)   AS  `price`,
+				        GROUP_CONCAT(CASE WHEN  code = 'refPrice'  THEN  num_value ELSE  null  END)   AS  `refPrice`,
+				        GROUP_CONCAT(CASE WHEN  code = 'primaryImage'  THEN  text_value ELSE  null  END)   AS  `primaryImage`
+                        FROM crawl_data GROUP BY url) t, domain_groups g where t.domain=g.domain and t.id='${dih.delta.id}'"
+			deltaQuery="select DISTINCT t.url as id from (SELECT url , 
+                        GROUP_CONCAT(CASE WHEN  code = 'domain'  THEN  text_value ELSE  null  END)   AS  `domain`
+                        FROM crawl_data GROUP BY url) t, domain_groups g
+                        where t.domain=g.domain and g.update_time > '${dataimporter.last_index_time}'">
+			
+			<field column="name" toPinyin="pinyin" mode="capital"/>
+			
+			<entity name="group" query="select group_code from domain_groups where domain='${item.domain}'">
+				<field name="groups" column="group_code" />
+			</entity>
+		</entity>
+	</document>
+</dataConfig>
+
