@@ -63,12 +63,12 @@ public class HttpWebClient {
         }
     }
 
-    public static HtmlPage getHtmlPage(String url) {
-        return (HtmlPage) getPage(url, null);
+    public static HtmlPage getHtmlPage(String url, Configuration conf) {
+        return (HtmlPage) getPage(url, conf);
     }
 
     public static void main(String[] args) {
-        HtmlPage page = getHtmlPage("http://www.jumeiglobal.com/deal/ht150312p1286156t1.html");
+        HtmlPage page = getHtmlPage("http://www.jumeiglobal.com/deal/ht150312p1286156t1.html", null);
         System.out.println(page.asXml());
     }
 }

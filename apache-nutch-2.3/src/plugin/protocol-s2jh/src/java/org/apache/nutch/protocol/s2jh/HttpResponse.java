@@ -342,7 +342,7 @@ public class HttpResponse implements Response {
             return false;
         }
         Http.LOG.debug("Htmlunit fetching: " + url);
-        HtmlPage page = (HtmlPage) HttpWebClient.getPage(urlStr, conf);
+        HtmlPage page = (HtmlPage) HttpWebClient.getHtmlPage(urlStr, conf);
         charset = page.getPageEncoding();
         String html = null;
         boolean ok = true;

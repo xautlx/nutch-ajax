@@ -37,6 +37,7 @@
 
   <dependencies>
     <dependency org="org.ccil.cowan.tagsoup" name="tagsoup" rev="1.2" conf="*->master"/>
+    <dependency org="net.sourceforge.htmlunit" name="htmlunit" rev="2.15" conf="*->default" />
   </dependencies>
   
 </ivy-module>
