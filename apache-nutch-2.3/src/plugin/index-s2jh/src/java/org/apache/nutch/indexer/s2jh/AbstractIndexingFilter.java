@@ -26,6 +26,10 @@ public abstract class AbstractIndexingFilter implements IndexingFilter {
 
     private Configuration conf;
 
+    // 从MetaData数据中提取标识需要添加到Solr Index的前缀
+    // 为了避免对parse-s2jh组件的依赖，在各自组件中定义常量，请注意和CrawlData对应常量值保持一致
+    protected final static String INDEX_PROPERTY_PREFIX = "_index_";
+
     @Override
     public Configuration getConf() {
         return conf;
@@ -50,11 +54,16 @@ public abstract class AbstractIndexingFilter implements IndexingFilter {
             return null;
         }
 
+        //默认用的是reverseUrl，转换为直接用原始url,便于进行关联比对
+        doc.removeField("id");
+        doc.add("id", url);
+
         return filterInternal(doc, url, page);
     }
 
     /**
      * 调用解析过滤器中判断只有被自定义解析的url地址内容才添加到solr索引，其余的忽略
+     * 
      * @param url
      * @return
      */
@@ -64,7 +73,7 @@ public abstract class AbstractIndexingFilter implements IndexingFilter {
         if (parseFilters != null) {
             for (AbstractHtmlParseFilter htmlParseFilter : parseFilters) {
                 Boolean ret = htmlParseFilter.isUrlMatchedForParse(url);
-                //任何一个判断返回true表示为需要解析并进行索引的数据
+                // 任何一个判断返回true表示为需要解析并进行索引的数据
                 if (ret == true) {
                     ok = true;
                     break;

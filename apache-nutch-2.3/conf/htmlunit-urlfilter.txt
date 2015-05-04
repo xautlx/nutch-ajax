@@ -38,5 +38,17 @@
 -^http://dmp.kejet.net.*
 -^http://cms.gtags.net.*
 
+################ jumei.com ######################
+-^http://www.google-analytics.com
+-^http://cpro.baidu.com
+-^http://search.jumei.com/ajax_get_default_word
+-^http://click.srv.jumei.com
+-^http://www.jumei.com/serverinfo.php
+-^http://cart.jumei.com/i/ajax/get_cart_data
+-^http://www.jumei.com/i/ajax/get_view_history
+-^http://www.jumei.com/i/ajax/get_recommend_by_history
+-^http://www.jumei.com/i/ajax/get_keyword_pro
+-^http://eclick.baidu.com
+
 # accept anything else
 +.*

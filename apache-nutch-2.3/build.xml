@@ -464,12 +464,14 @@
 
  <!-- target: resolve ================================================= -->
  <target name="resolve-default" depends="clean-lib, init" description="--> resolve and retrieve dependencies with ivy">
+  <property name="ivy.default.ivy.user.dir" value="${basedir}/ivy/repository"/>
   <ivy:resolve file="${ivy.file}" conf="default" log="download-only" />
   <ivy:retrieve pattern="${build.lib.dir}/[artifact]-[revision].[ext]" symlink="false" log="quiet" />
   <antcall target="copy-libs" />
  </target>
 
  <target name="resolve-test" depends="clean-lib, init" description="--> resolve and retrieve dependencies with ivy">
+  <property name="ivy.default.ivy.user.dir" value="${basedir}/ivy/repository"/>
   <ivy:resolve file="${ivy.file}" conf="test" log="download-only" />
   <ivy:retrieve pattern="${build.lib.dir}/[artifact]-[revision].[ext]" symlink="false" log="quiet" />
   <antcall target="copy-libs" />

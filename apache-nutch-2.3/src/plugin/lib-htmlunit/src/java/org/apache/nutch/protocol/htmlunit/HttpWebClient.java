@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
+import com.gargoylesoftware.htmlunit.Page;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
@@ -26,7 +27,7 @@ public class HttpWebClient {
 
     private static String acceptLanguage;
 
-    public static HtmlPage getHtmlPage(String url, Configuration conf) {
+    public static Page getPage(String url, Configuration conf) {
         synchronized (Thread.currentThread()) {
             try {
                 WebRequest req = new WebRequest(new URL(url));
@@ -54,7 +55,7 @@ public class HttpWebClient {
                     }
                     threadWebClient.set(webClient);
                 }
-                HtmlPage page = webClient.getPage(req);
+                Page page = webClient.getPage(req);
                 return page;
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -63,6 +64,11 @@ public class HttpWebClient {
     }
 
     public static HtmlPage getHtmlPage(String url) {
-        return getHtmlPage(url, null);
+        return (HtmlPage) getPage(url, null);
+    }
+
+    public static void main(String[] args) {
+        HtmlPage page = getHtmlPage("http://www.jumeiglobal.com/deal/ht150312p1286156t1.html");
+        System.out.println(page.asXml());
     }
 }

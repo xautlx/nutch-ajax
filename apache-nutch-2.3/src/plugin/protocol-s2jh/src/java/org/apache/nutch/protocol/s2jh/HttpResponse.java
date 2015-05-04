@@ -273,7 +273,6 @@ public class HttpResponse implements Response {
         return content;
     }
 
-    // 最大Javascript执行等待时间
     private static final int MAX_AJAX_WAIT_SECONDS = 20;
 
     private boolean readPlainContent(String urlStr, InputStream in) throws Exception {
@@ -343,7 +342,7 @@ public class HttpResponse implements Response {
             return false;
         }
         Http.LOG.debug("Htmlunit fetching: " + url);
-        HtmlPage page = HttpWebClient.getHtmlPage(urlStr, conf);
+        HtmlPage page = (HtmlPage) HttpWebClient.getPage(urlStr, conf);
         charset = page.getPageEncoding();
         String html = null;
         boolean ok = true;
@@ -361,18 +360,6 @@ public class HttpResponse implements Response {
         if (ok == true) {
             this.code = 200;
             Http.LOG.debug("Success parse page by Htmlunit  for: {}", url);
-
-            // 移除无关节点减少数据处理内容并且可以避免潜在的文档结构不规范导致的错误
-            //                List toboRemoveNodes = Lists.newArrayList();
-            //                toboRemoveNodes.addAll(page.getByXPath("//SCRIPT"));
-            //                toboRemoveNodes.addAll(page.getByXPath("//STYLE"));
-            //                toboRemoveNodes.addAll(page.getByXPath("//LINK"));
-            //                toboRemoveNodes.addAll(page.getByXPath("//comment()"));
-            //                for (Object node : toboRemoveNodes) {
-            //                    ((DomNode) node).remove();
-            //                }
-
-            // 去掉xml头部字符串
             html = StringUtils.substringAfter(html, "?>").trim();
         }
 
@@ -380,11 +367,19 @@ public class HttpResponse implements Response {
             this.code = 200;
             content = html.getBytes();
         } else {
-            Http.LOG.warn("Failure parse page for: {}", url);
+            Http.LOG.warn("Failure Htmlunit parse page for: {}", url);
+            Http.LOG.warn("Htmlunit Fetch Failure URL: " + url + ", CharsetName: " + charset + " , Page HTML=\n" + html);
         }
         return ok;
     }
 
+    /**
+     * Most page can be fetched and parsed efficiently by Htmlunit, 
+     * But some sites (such as ) using some special javascript tech that can't be processed by Htmlunit correctly,
+     * We use Selenium WebDriver even lower process speed.
+     * @param url
+     * @throws Exception
+     */
     private void readPlainContentByWebDriver(URL url) throws Exception {
 
         String urlStr = url.toString();
@@ -392,7 +387,6 @@ public class HttpResponse implements Response {
         String html = null;
         boolean ok = true;
 
-        //除绝大部分AJAX页面都能被htmlunit正常解析，个别网站采用的JS技术比较另类导致无法解析则退回采用效率稍低的selenium2获取最终内容
         WebDriver driver = null;
         try {
             driver = new FirefoxDriver();
@@ -405,7 +399,7 @@ public class HttpResponse implements Response {
                 if (ok) {
                     break;
                 }
-                //触发页面滚动
+                //Trigger scroll event to get ajax content                
                 ((JavascriptExecutor) driver).executeScript("scroll(0," + (i * 500) + ");");
                 Http.LOG.info("Sleep " + i + " seconds to wait WebDriver execution...");
                 Thread.sleep(1000);
@@ -422,14 +416,16 @@ public class HttpResponse implements Response {
             this.code = 200;
             content = html.getBytes();
         } else {
-            Http.LOG.warn("Failure parse page for: {}", url);
+            Http.LOG.warn("Failure WebDriver parse page for: {}", url);
+            Http.LOG.warn("WebDriver Fetch Failure URL: " + url + ", CharsetName: " + charset + " , Page HTML=\n" + html);
         }
     }
 
     /**
-     * 调用解析过滤器中判断所需的关键页面内容是否已经加载
-     * @param url
-     * @param html
+     * Check excepted data has loaded within the current AJAX page content
+     * If not we need sleep sometime to wait ajax execution to get more content  
+     * @param url 
+     * @param html 
      * @return
      */
     private boolean isParseDataFetchLoaded(String url, String html) {
@@ -439,7 +435,7 @@ public class HttpResponse implements Response {
             for (AbstractHtmlParseFilter htmlParseFilter : parseFilters) {
                 Boolean ret = htmlParseFilter.isParseDataFetchLoaded(url, html);
                 Http.LOG.debug("Invoke isParseDataFetchLoaded of {} , return : {}", htmlParseFilter.getClass(), ret);
-                //任何一个判断返回false标识暂未加载所需数据
+                //Any one return NOT loaded, break and return flase
                 if (ret == false) {
                     ok = false;
                     break;

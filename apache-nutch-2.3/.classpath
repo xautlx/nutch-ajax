@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="lib" path="conf"/>
+	<classpathentry kind="lib" path="lib/hadoop-core-1.2.0.jar"/>
 	<classpathentry kind="src" path="src/plugin/lib-htmlunit/src/java"/>
 	<classpathentry kind="src" path="src/plugin/lib-pinyin/src/java"/>
 	<classpathentry kind="src" path="src/plugin/protocol-s2jh/src/java"/>
 	<classpathentry kind="src" path="src/plugin/parse-s2jh/src/java"/>
 	<classpathentry kind="src" path="src/plugin/index-s2jh/src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=apache-nutch-2.3&amp;ivyXmlPath=ivy%2Fivy.xml&amp;confs=*&amp;ivySettingsPath=&amp;loadSettingsOnDemand=false&amp;ivyUserDir=ivy%2Frepository&amp;propertyFiles=&amp;sourceTypes=source&amp;javadocTypes=&amp;sourceSuffixes=-source%2C-sources%2C-src&amp;javadocSuffixes=&amp;mapIfOnlyOneSource=false&amp;mapIfOnlyOneJavadoc=false"/>
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="src" path="src/plugin/creativecommons/src/java"/>
 	<classpathentry kind="src" path="src/plugin/creativecommons/src/test"/>
@@ -65,9 +67,7 @@
 	<classpathentry kind="src" path="src/plugin/urlnormalizer-regex/src/java"/>
 	<classpathentry kind="src" path="src/plugin/urlnormalizer-regex/src/test"/>
 	<classpathentry kind="lib" path="src/bin"/>
-	<classpathentry kind="lib" path="lib/hadoop-core-1.2.0.jar"/>
 	<classpathentry kind="lib" path="lib/automaton-1.11-8.jar"/>
 	<classpathentry kind="lib" path="lib/tagsoup-1.2.1.jar"/>
-	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=apache-nutch-2.3&amp;ivyXmlPath=ivy%2Fivy.xml&amp;confs=*"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

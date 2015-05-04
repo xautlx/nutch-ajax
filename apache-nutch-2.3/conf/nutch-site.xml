@@ -5,7 +5,7 @@
 
 <configuration>
 
-    <!--  -->
+    <!-- Just for development, please remove this plugin.folders for production env -->
 	<property>
 		<name>plugin.folders</name>
 		<value>./src/plugin</value>
@@ -14,8 +14,7 @@
 
 	<property>
 		<name>plugin.includes</name>
-		<value>protocol-s2jh|urlfilter-regex|parse-(html|s2jh)|index-(basic|anchor)|indexer-solr
-		</value>
+		<value>protocol-s2jh|urlfilter-regex|parse-(html|s2jh)|index-(basic|s2jh)|urlnormalizer-(pass|regex|basic)|scoring-opic|indexer-solr</value>
 		<description>Regular expression naming plugin directory names to
 			include. Any plugin not matching this expression is
 			excluded.
@@ -86,14 +85,48 @@
 		<value>org.apache.gora.mongodb.store.MongoStore</value>
 		<description>Default class for storing data</description>
 	</property>
+	
+	<property>
+		<name>solr.server.url</name>
+		<value>http://localhost:8983/solr</value>
+	</property>
+	
 
-    <!-- Custom proerties -->
+    <!-- Custom extension plug-in properties -->
+	<property>
+		<name>fetch.force.ajax.support</name>
+		<value>true</value>
+		<description>
+			true: Force using Htmlunit or WebDriver to fetch content
+			false: First using HTTP without ajax support, if
+			failure then using Htmlunit or WebDriver
+		</description>
+	</property>
+	<property>
+		<name>parse.img.save.dir</name>
+		<value>C:\\nutch\\</value>
+		<description>
+			Image files saved ROOT dir. Sub paths based on img src url.
+		</description>
+	</property>
 	<property>
 		<name>parse.data.persist.mode</name>
-		<value>mongodb</value>
+		<value>jdbc</value>
 		<description>
 			println: Just System.out.println
-			jdbc: Persist to Database by JDBC
+			jdbc: Persist to Database by JDBC. MySQL table ddl for example:
+				    CREATE TABLE `crawl_data` (
+				    `url` varchar(255) NOT NULL,
+				    `code` varchar(255) NOT NULL,
+				    `name` varchar(255) DEFAULT NULL,
+				    `category` varchar(255) DEFAULT NULL,
+				    `order_index` int(255) DEFAULT NULL,
+				    `fetch_time` datetime NOT NULL,
+				    `text_value` text,
+				    `html_value` text,
+				    `date_value` datetime DEFAULT NULL,
+				    `num_value` decimal(18,2) DEFAULT NULL
+				    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 			mongodb: Persist to MongoDB
 		</description>
 	</property>

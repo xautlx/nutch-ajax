@@ -25,11 +25,11 @@ public class TMallHtmlParseFilter extends AbstractHtmlParseFilter {
     public Parse filterInternal(String url, WebPage page, Parse parse, HTMLMetaTags metaTags, DocumentFragment doc) {
         List<CrawlData> crawlDatas = Lists.newArrayList();
 
-        crawlDatas.add(new CrawlData(url, "title", "商品名称").setTextValue(getXPathValue(doc, "//DIV[@class='tb-detail-hd']/H1"), page));
-        crawlDatas.add(new CrawlData(url, "price", "价格区间").setTextValue(getXPathValue(doc, "//SPAN[@class='tm-price']"), page));
+        crawlDatas.add(new CrawlData(url, "title", "商品名称").setTextValue(getXPathValue(doc, "//DIV[@class='tb-detail-hd']/H1")));
+        crawlDatas.add(new CrawlData(url, "tm-price", "价格区间").setTextValue(getXPathValue(doc, "//SPAN[@class='tm-price']")));
         crawlDatas.add(new CrawlData(url, "description", "描述HTML").setHtmlValue(getXPathHtml(doc, "//DIV[@id='description']")));
 
-        saveCrawlData(url, crawlDatas);
+        saveCrawlData(url, crawlDatas, page);
 
         // 用于网页内容索引的页面内容，一般是去头去尾处理后的有效信息内容
         String txt = getXPathValue(doc, "//DIV[@id='page']");
@@ -48,7 +48,7 @@ public class TMallHtmlParseFilter extends AbstractHtmlParseFilter {
     }
 
     @Override
-    protected boolean isParseDataFetchLoaded(String html) {
+    protected boolean isParseDataFetchLoadedInternal(String url, String html) {
         return !html.contains("描述加载中");
     }
 

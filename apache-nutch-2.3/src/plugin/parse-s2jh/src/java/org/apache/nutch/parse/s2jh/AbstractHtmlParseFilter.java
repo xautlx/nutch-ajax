@@ -1,5 +1,8 @@
 package org.apache.nutch.parse.s2jh;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,27 +22,38 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.html.dom.HTMLDocumentImpl;
 import org.apache.nutch.parse.HTMLMetaTags;
 import org.apache.nutch.parse.Parse;
 import org.apache.nutch.parse.ParseFilter;
+import org.apache.nutch.parse.html.DOMBuilder;
+import org.apache.nutch.parse.s2jh.CrawlData.ValueType;
 import org.apache.nutch.plugin.Extension;
 import org.apache.nutch.plugin.ExtensionPoint;
 import org.apache.nutch.plugin.PluginRepository;
 import org.apache.nutch.plugin.PluginRuntimeException;
+import org.apache.nutch.protocol.htmlunit.HttpWebClient;
 import org.apache.nutch.storage.WebPage;
 import org.apache.nutch.storage.WebPage.Field;
 import org.apache.nutch.util.StringUtil;
+import org.cyberneko.html.parsers.DOMFragmentParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.Assert;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import com.gargoylesoftware.htmlunit.Page;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -65,12 +79,22 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
 
     private Configuration conf;
 
+    private static String imgSaveRootDir;
+
+    private String defaultCharEncoding;
+
+    private String parserImpl;
+
     public void setConf(Configuration conf) {
         this.conf = conf;
         String filterRegex = getUrlFilterRegex();
         if (StringUtils.isNotBlank(filterRegex)) {
             this.filterPattern = Pattern.compile(getUrlFilterRegex());
         }
+
+        this.parserImpl = getConf().get("parser.html.impl", "neko");
+        this.defaultCharEncoding = getConf().get("parser.character.encoding.default", "windows-1252");
+
         try {
             transformer = TransformerFactory.newInstance().newTransformer();
             //transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
@@ -85,6 +109,12 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
         return this.conf;
     }
 
+    /**
+     * 基于xpath获取Node列表
+     * @param node
+     * @param xpath
+     * @return
+     */
     protected static NodeList selectNodeList(Node node, String xpath) {
         try {
             return XPathAPI.selectNodeList(node, xpath);
@@ -94,6 +124,12 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
         return null;
     }
 
+    /**
+     * 基于xpath获取Node节点
+     * @param node
+     * @param xpath
+     * @return
+     */
     protected Node selectSingleNode(Node contextNode, String xpath) {
         try {
             return XPathAPI.selectSingleNode(contextNode, xpath);
@@ -103,25 +139,78 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
         return null;
     }
 
+    /**
+     * 基于xpath定义的img元素解析返回完整路径格式的URL字符串
+     * @param url 页面URL，有些img的src元素为相对路径，通过此url合并组装图片完整URL路径
+     * @param contextNode
+     * @param xpaths 多个xpath字符串，主要用于容错处理，有些页面格式不统一，可能一会所需图片在xpath1，有些在xpath2，给定多个可能的xpath列表，按顺序循环找到一个匹配就终止循环
+     * @return http开头的完整路径图片URL
+     */
+    protected String getImgSrcValue(String url, Node contextNode, String... xpaths) {
+        for (String xpath : xpaths) {
+            Node node = selectSingleNode(contextNode, xpath);
+            String imgUrl = null;
+            if (node != null) {
+                NamedNodeMap atrributes = node.getAttributes();
+                Node attr = atrributes.getNamedItem("data-ks-lazyload");
+                if (attr == null) {
+                    attr = atrributes.getNamedItem("lazy-src");
+                }
+                if (attr == null) {
+                    attr = atrributes.getNamedItem("src");
+                }
+                if (attr != null) {
+                    imgUrl = attr.getTextContent();
+                }
+            }
+            if (StringUtils.isNotBlank(imgUrl)) {
+                return parseImgSrc(url, imgUrl);
+            }
+        }
+        return "";
+    }
+
+    /**
+     * 基于xpath定位返回text内容，如果未找到元素返回null
+     * @param contextNode
+     * @param xpath
+     * @return
+     */
     protected String getXPathValue(Node contextNode, String xpath) {
         return getXPathValue(contextNode, xpath, null);
     }
 
+    /**
+     * 基于xpath定位返回text内容，如果未找到元素则返回默认defaultVal
+     * @param contextNode
+     * @param xpath
+     * @param defaultVal
+     * @return
+     */
     protected String getXPathValue(Node contextNode, String xpath, String defaultVal) {
-        Node node = selectSingleNode(contextNode, xpath);
-        if (node == null) {
+        NodeList nodes = selectNodeList(contextNode, xpath);
+        if (nodes == null || nodes.getLength() <= 0) {
             return defaultVal;
-        } else {
-            String txt = null;
-            if (node instanceof Text) {
-                txt = node.getNodeValue();
-            } else {
-                txt = node.getTextContent();
-            }
-            return cleanInvisibleChar(txt);
         }
+        String txt = "";
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node instanceof Text) {
+                txt += node.getNodeValue();
+            } else {
+                txt += node.getTextContent();
+            }
+        }
+        return cleanInvisibleChar(txt);
+
     }
 
+    /**
+     * 基于xpath返回对应的html格式内容
+     * @param contextNode
+     * @param xpath
+     * @return
+     */
     protected String getXPathHtml(Node contextNode, String xpath) {
         Node node = selectSingleNode(contextNode, xpath);
         return asString(node);
@@ -149,9 +238,9 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
      * @param imgSrc
      * @return
      */
-    protected String parseImgSrc(String url, String imgSrc) {
+    private String parseImgSrc(String url, String imgSrc) {
         if (StringUtils.isBlank(imgSrc)) {
-            return null;
+            return "";
         }
         imgSrc = imgSrc.trim();
         //去掉链接最后的#号
@@ -253,8 +342,7 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
             if (LOG.isInfoEnabled()) {
                 long elapsed = (System.currentTimeMillis() - start) / 1000;
                 float avgPagesSec = (float) pages.get() / elapsed;
-                LOG.info(" - Custom prased total " + pages.get() + " pages, " + elapsed + " seconds, avg "
-                        + avgPagesSec + " pages/s");
+                LOG.info(" - Custom prased total " + pages.get() + " pages, " + elapsed + " seconds, avg " + avgPagesSec + " pages/s");
             }
             return parse;
         } catch (Exception e) {
@@ -276,18 +364,28 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
     `text_value` text,
     `html_value` text,
     `date_value` datetime DEFAULT NULL,
-    `num_value` decimal(18,4) DEFAULT NULL
+    `num_value` decimal(18,2) DEFAULT NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
      * 按照代码纵向存储各属性值，在需要的时候再转成横向，参考SQL脚本：
-     * SELECT url,fetch_time, CASE WHEN  code = 'title'  THEN  text_value ELSE  null  END   AS  `title` FROM crawl_data GROUP BY url,fetch_time
+     * SELECT url,fetch_time, 
+     * GROUP_CONCAT(CASE WHEN  code = 'title'  THEN  text_value ELSE  null  END)   AS  `title` 
+     * GROUP_CONCAT(CASE WHEN  code = 'price'  THEN  num_value ELSE  null  END)   AS  `价格`,
+     * FROM crawl_data GROUP BY url,fetch_time
      */
     private static final String selectSQL = "SELECT count(*) from crawl_data where url=?";
     private static final String deleteSQL = "DELETE from crawl_data where url=?";
     private static final String insertSQL = "INSERT INTO crawl_data(url, code, name, category, order_index, fetch_time, text_value, html_value,date_value, num_value) "
             + "VALUES (?,?,?,?,?,?,?,?,?,?)";
 
-    protected void saveCrawlData(String url, List<CrawlData> crawlDatas) {
+    /**
+     * 属性持久化处理，基于nutch-site.xml中parse.data.persist.mode定义值
+     * @param url
+     * @param crawlDatas
+     * @param page
+     */
+    protected void saveCrawlData(String url, List<CrawlData> crawlDatas, WebPage page) {
+
         String persistMode = conf.get("parse.data.persist.mode");
         if (StringUtils.isBlank(persistMode) || "println".equalsIgnoreCase(persistMode)) {
             System.out.println("Parsed data properties:");
@@ -297,12 +395,34 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
             return;
         }
 
+        //img fetch and persist
+        for (CrawlData crawlData : crawlDatas) {
+            if (ValueType.img.equals(crawlData.getType()) && StringUtils.isNotBlank(crawlData.getTextValue())) {
+                if (imgSaveRootDir == null) {
+                    imgSaveRootDir = getConf().get("parse.img.save.dir");
+                    Assert.isTrue(StringUtils.isNoneBlank(imgSaveRootDir), "'parse.img.save.dir' conf parameter missing");
+                    if (!imgSaveRootDir.endsWith("/")) {
+                        imgSaveRootDir += "/";
+                    }
+                }
+                try {
+                    String imgSrc = crawlData.getTextValue();
+                    Page imgPage = HttpWebClient.getPage(imgSrc, getConf());
+                    InputStream is = imgPage.getWebResponse().getContentAsStream();
+                    File file = new File(imgSaveRootDir + StringUtils.substringAfter(imgSrc, "//"));
+                    FileUtils.copyInputStreamToFile(is, file);
+                } catch (IOException e) {
+                    crawlData.setImgValue(null, page);
+                    LOG.error("Error to img process", e);
+                }
+            }
+        }
+
         if ("jdbc".equalsIgnoreCase(persistMode)) {
             Connection conn = null;
             try {
                 Class.forName(conf.get("jdbc.driver"));
-                conn = DriverManager.getConnection(conf.get("jdbc.url"), conf.get("jdbc.username"),
-                        conf.get("jdbc.password"));
+                conn = DriverManager.getConnection(conf.get("jdbc.url"), conf.get("jdbc.username"), conf.get("jdbc.password"));
                 PreparedStatement selectPS = conn.prepareStatement(selectSQL);
                 selectPS.setString(1, url);
                 ResultSet rs = selectPS.executeQuery();
@@ -370,8 +490,7 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
 
         if ("mongodb".equalsIgnoreCase(persistMode)) {
             try {
-                MongoClient mongoClient = new MongoClient(conf.get("mongodb.host"), Integer.valueOf(conf
-                        .get("mongodb.port")));
+                MongoClient mongoClient = new MongoClient(conf.get("mongodb.host"), Integer.valueOf(conf.get("mongodb.port")));
                 DB db = mongoClient.getDB(conf.get("mongodb.db"));
                 DBCollection coll = db.getCollection("crawl_data");
                 BasicDBObject bo = new BasicDBObject("url", url).append("fetch_time", new Date());
@@ -400,6 +519,11 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
     private static AbstractHtmlParseFilter[] parseFilters;
     public static final String HTMLPARSEFILTER_ORDER = "htmlparsefilter.order";
 
+    /**
+     * 帮助类方法：获取当前所有配置的自定义过滤器集合
+     * @param conf
+     * @return
+     */
     public static AbstractHtmlParseFilter[] getParseFilters(Configuration conf) {
         //Prepare  parseFilters
         String order = conf.get(HTMLPARSEFILTER_ORDER);
@@ -478,9 +602,82 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
             if (StringUtils.isBlank(html)) {
                 return false;
             }
-            return isParseDataFetchLoaded(html);
+            return isParseDataFetchLoadedInternal(url, html);
         }
         return true;
+    }
+
+    /**
+     * 目前已知类似：http://www.jumeiglobal.com/deal/ht150312p1286156t1.html
+     * 所需采集数据在textarea元素下面，htmlunit在printXml时会对textarea内容进行escape处理，导致得到的doc对象无法直接XPath定位
+     * 因此需要先提前textarea元素内容转换为单独的DocumentFragment对象，然后基于此文档对象进行数据解析
+     * @see org.apache.nutch.parse.html.HtmlParser#parse
+     * @param input
+     * @return 
+     * @throws Exception
+     */
+    protected DocumentFragment parse(InputSource input) throws Exception {
+        if (parserImpl.equalsIgnoreCase("tagsoup"))
+            return parseTagSoup(input);
+        else
+            return parseNeko(input);
+    }
+
+    /**
+     * @see org.apache.nutch.parse.html.HtmlParser#parseTagSoup
+     */
+    private DocumentFragment parseTagSoup(InputSource input) throws Exception {
+        HTMLDocumentImpl doc = new HTMLDocumentImpl();
+        DocumentFragment frag = doc.createDocumentFragment();
+        DOMBuilder builder = new DOMBuilder(doc, frag);
+        org.ccil.cowan.tagsoup.Parser reader = new org.ccil.cowan.tagsoup.Parser();
+        reader.setContentHandler(builder);
+        reader.setFeature(org.ccil.cowan.tagsoup.Parser.ignoreBogonsFeature, true);
+        reader.setFeature(org.ccil.cowan.tagsoup.Parser.bogonsEmptyFeature, false);
+        reader.setProperty("http://xml.org/sax/properties/lexical-handler", builder);
+        reader.parse(input);
+        return frag;
+    }
+
+    /**
+     * @see org.apache.nutch.parse.html.HtmlParser#parseNeko
+     */
+    private DocumentFragment parseNeko(InputSource input) throws Exception {
+        DOMFragmentParser parser = new DOMFragmentParser();
+        try {
+            parser.setFeature("http://cyberneko.org/html/features/scanner/allow-selfclosing-iframe", true);
+            parser.setFeature("http://cyberneko.org/html/features/augmentations", true);
+            parser.setProperty("http://cyberneko.org/html/properties/default-encoding", defaultCharEncoding);
+            parser.setFeature("http://cyberneko.org/html/features/scanner/ignore-specified-charset", true);
+            parser.setFeature("http://cyberneko.org/html/features/balance-tags/ignore-outside-content", false);
+            parser.setFeature("http://cyberneko.org/html/features/balance-tags/document-fragment", true);
+            parser.setFeature("http://cyberneko.org/html/features/report-errors", LOG.isTraceEnabled());
+        } catch (SAXException e) {
+        }
+        // convert Document to DocumentFragment
+        HTMLDocumentImpl doc = new HTMLDocumentImpl();
+        doc.setErrorChecking(false);
+        DocumentFragment res = doc.createDocumentFragment();
+        DocumentFragment frag = doc.createDocumentFragment();
+        parser.parse(input, frag);
+        res.appendChild(frag);
+
+        try {
+            while (true) {
+                frag = doc.createDocumentFragment();
+                parser.parse(input, frag);
+                if (!frag.hasChildNodes())
+                    break;
+                if (LOG.isInfoEnabled()) {
+                    LOG.info(" - new frag, " + frag.getChildNodes().getLength() + " nodes.");
+                }
+                res.appendChild(frag);
+            }
+        } catch (Exception x) {
+            LOG.error("Failed with the following Exception: ", x);
+        }
+        ;
+        return res;
     }
 
     /**
@@ -496,7 +693,7 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
      * @param html 页面HTML
      * @return 默认返回true，子类根据需要定制判断逻辑
      */
-    protected abstract boolean isParseDataFetchLoaded(String html);
+    protected abstract boolean isParseDataFetchLoadedInternal(String url, String html);
 
     /**
      * 判断当前页面内容是否业务关注的页面
@@ -510,6 +707,5 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
      * 子类实现具体的页面数据解析逻辑
      * @return
      */
-    public abstract Parse filterInternal(String url, WebPage page, Parse parse, HTMLMetaTags metaTags,
-            DocumentFragment doc);
+    public abstract Parse filterInternal(String url, WebPage page, Parse parse, HTMLMetaTags metaTags, DocumentFragment doc) throws Exception;
 }

@@ -26,7 +26,12 @@ public class ChineseToPinyinConvertor {
     }
 
     public static enum MODE {
-        capital, whole, both
+        //大写首字母
+        capital,
+        //全拼
+        whole,
+        //首字母和全拼都输出
+        both
     }
 
     public static Set<String> toPinyin(String chinese, MODE mode) {

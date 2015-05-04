@@ -39,3 +39,37 @@
 +^http://apple.tmall.com/category.htm$
 +^http://apple.tmall.com/category.htm\?.*&mid=.*&pageNo=.*#anchor$
 +^http://detail.tmall.com/item.htm\?id=.*&rn=.*&abbucket=.*
+
+################ vip.com ######################
+#vip.com分类主入口页面：
++^http://category.vip.com/$
+
+#http://category.vip.com/入口页面各分类链接: 
+#http://category.vip.com/search-1-0-1.html?q=3|20263&wz=9
++^http://category.vip.com/search-\d*-0-1.html\?q=\d*\|\d*&.*=\d*$
+
+#各分类列表页面“上一页”，“下一页”链接：
+#http://category.vip.com/search-1-0-3.html?q=3|7851|#catPerPos
+#http://category.vip.com/search-1-0-2.html?q=3|7851|#catPerPos
++^http://category.vip.com/search-\d*-0-\d*.html\?q=\d*\|\d*\|#catPerPos$
+
+#分类列表页面的商品详情链接：
+#http://www.vip.com/detail-371486-48229111.html
+#http://www.vip.com/detail-372836-48278633.html
++^http://www.vip.com/detail-\d*-\d*.html$
+
+################ jumei.com ######################
++^http://search.jumei.com/$
+
+#http://search.jumei.com/?filter=0-11-3&search=&bid=4&site=sh#search_list_wrap -> http://search.jumei.com/?filter=0-11-3&search=&bid=4&site=sh
+#http://search.jumei.com/?filter=0-11-4&search=&bid=4&site=sh#search_list_wrap -> http://search.jumei.com/?filter=0-11-4&search=&bid=4&site=sh
++^http://search.jumei.com/\?filter=0-11-([0-9]|[1-9][0-9]|1[0-7][0-9]|18[0-7])&search=&bid=4(&site=sh)?$
+
+#http://sh.jumei.com/i/deal/d150309p1818zc.html?from=sr__4_7 -> http://sh.jumei.com/i/deal/d150309p1818zc.html
+#http://sh.jumei.com/i/deal/d150308p537649zc.html?from=sr__6_7 -> http://sh.jumei.com/i/deal/d150308p537649zc.html
++^http://sh.jumei.com/i/deal/.*.html$
+#http://item.jumei.com/d150309p1476zc.html
++^http://item.jumei.com/.*.html$
+
+#http://www.jumeiglobal.com/deal/ht150122p933681t1.html?from=sr__1_1 -> http://www.jumeiglobal.com/deal/ht150122p933681t1.html
++^http://www.jumeiglobal.com/deal/.*.html$

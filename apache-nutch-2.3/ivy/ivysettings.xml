@@ -62,7 +62,7 @@
       m2compatible="true"
       />
     <ibiblio name="restlet"
-      root="http://maven.restlet.org"
+      root="http://maven.restlet.com"
       pattern="${maven2.pattern.ext}"
       m2compatible="true"
       />
@@ -78,6 +78,7 @@
       <resolver ref="oschina"/>
       -->
       <resolver ref="maven2"/>
+      <resolver ref="restlet"/>
       <resolver ref="sonatype"/>
       <resolver ref="apache-snapshot"/>
     </chain>
