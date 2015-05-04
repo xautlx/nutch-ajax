@@ -45,6 +45,13 @@ It developed and tested with Apache Nutch 2.3, you can try it on other Nutch 2.X
 
 * **index-s2jh**: 追加设置需要额外传递给SOLR索引的属性数据; 设定不需要索引的页面规则;
 
+### 详细参考文档
+
+项目提供一份比较详细的“基于Nutch&Solr定向采集解析和索引搜索的整合技术指南文档”，可通过以下两种方式查看参考文档内容：
+
+* 直接获取项目内容后，在document目录下根据自己熟悉的编辑器查看对应的md或html格式文档；
+* GitHub直接解析md文件，并且能正确处理图片链接，因此可直接在线访问 https://github.com/xautlx/nutch-ajax/blob/master/document/Apache_Nutch_Solr_Solution_with_AJAX_support.md 
+
 ### 许可说明
 
 * Free Open Source
