@@ -87,7 +87,7 @@
 <!-- tmall.com -->
 <!-- http://detail.tmall.com/item.htm?spm=a1z10.4-b.w5003-5366045755.6.aLdfxv&id=41572748070&scene=taobao_shop -> http://detail.tmall.com/item.htm?id=41572748070&scene=taobao_shop -->
 <regex>
-  <pattern>spm=.*&</pattern>
+  <pattern>spm=.*&amp;</pattern>
   <substitution></substitution>
 </regex>
 
