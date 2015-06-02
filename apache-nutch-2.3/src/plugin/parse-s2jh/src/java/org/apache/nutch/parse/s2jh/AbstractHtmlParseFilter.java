@@ -266,9 +266,24 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
      * @return
      */
     protected String cleanInvisibleChar(String str) {
+        return cleanInvisibleChar(str, false);
+    }
+
+    /**
+     * 清除无关的不可见空白字符
+     * @param str
+     * @param includingBlank 是否包括移除文本内部的空白字符
+     * @return
+     */
+    protected String cleanInvisibleChar(String str, boolean includingBlank) {
         if (str != null) {
             str = StringUtils.remove(str, (char) 160);
-            //str = StringUtils.remove(str, " ");
+            if (includingBlank) {
+                //普通空格
+                str = StringUtils.remove(str, " ");
+                //全角空格
+                str = StringUtils.remove(str, (char) 12288);
+            }
             str = StringUtils.remove(str, "\r");
             str = StringUtils.remove(str, "\n");
             str = StringUtils.remove(str, "\t");
@@ -368,10 +383,10 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
      * 按照代码纵向存储各属性值，在需要的时候再转成横向，参考SQL脚本：
-     * SELECT url,fetch_time, 
-     * GROUP_CONCAT(CASE WHEN  code = 'title'  THEN  text_value ELSE  null  END)   AS  `title` 
-     * GROUP_CONCAT(CASE WHEN  code = 'price'  THEN  num_value ELSE  null  END)   AS  `价格`,
-     * FROM crawl_data GROUP BY url,fetch_time
+      SELECT url,fetch_time, 
+      GROUP_CONCAT(CASE WHEN  code = 'title'  THEN  text_value ELSE  null  END)   AS  `title` 
+      GROUP_CONCAT(CASE WHEN  code = 'price'  THEN  num_value ELSE  null  END)   AS  `价格`,
+      FROM crawl_data GROUP BY url,fetch_time
      */
     private static final String selectSQL = "SELECT count(*) from crawl_data where url=?";
     private static final String deleteSQL = "DELETE from crawl_data where url=?";

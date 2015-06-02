@@ -163,7 +163,7 @@
 	<dependency org="org.seleniumhq.selenium" name="selenium-java" rev="2.45.0" conf="*->default" />
 	<dependency org="org.seleniumhq.selenium" name="selenium-chrome-driver" rev="2.45.0" conf="*->default" />
     <dependency org="mysql" name="mysql-connector-java" rev="5.1.18" conf="*->default"/>
-    <dependency org="org.mongodb" name="mongo-java-driver" rev="2.12.5" conf="*->default"/>
+    <dependency org="org.mongodb" name="mongo-java-driver" rev="2.13.2" conf="*->default"/>
     <dependency org="com.belerweb" name="pinyin4j" rev="2.5.0" conf="*->default"/>
     <dependency org="org.apache.solr" name="solr-dataimporthandler" rev="4.6.0" conf="*->default" />
 

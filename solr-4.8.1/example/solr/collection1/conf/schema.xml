@@ -325,82 +325,34 @@
 			required="true" />
 
 		<!-- core fields -->
-		<field name="batchId" type="string" stored="true" indexed="false" />
+		<field name="batchId" type="string" stored="false" indexed="false" />
 		<field name="digest" type="string" stored="true" indexed="false" />
 		<field name="boost" type="float" stored="true" indexed="false" />
 
 		<!-- fields for index-basic plugin -->
 		<field name="host" type="url" stored="false" indexed="true" />
-		<field name="url" type="url" stored="true" indexed="true" />
+		<field name="url" type="url" stored="false" indexed="true" />
 		<!-- stored=true for highlighting, use term vectors and positions for fast 
 			highlighting -->
 		<field name="content" type="text_general" stored="true" indexed="true" />
-		<field name="title" type="text_general" stored="true" indexed="true"
+		<field name="title" type="text_general" stored="false" indexed="true"
 			multiValued="true" />
-		<field name="cache" type="string" stored="true" indexed="false" />
+		<field name="cache" type="string" stored="false" indexed="false" />
 		<field name="tstamp" type="date" stored="true" indexed="false" />
 
 		<!-- catch-all field -->
-		<field name="text" type="text_general" stored="false" indexed="true"
+		<field name="text" type="text_cn" stored="false" indexed="true"
 			multiValued="true" />
-
-		<!-- fields for index-anchor plugin -->
-		<field name="anchor" type="text_general" stored="true" indexed="true"
-			multiValued="true" />
-
-		<!-- fields for index-more plugin -->
-		<field name="type" type="string" stored="true" indexed="true"
-			multiValued="true" />
-		<field name="contentLength" type="string" stored="true" indexed="false" />
-		<field name="lastModified" type="date" stored="true" indexed="false" />
-		<field name="date" type="tdate" stored="true" indexed="true" />
-
-		<!-- fields for index-metadata plugin -->
-		<dynamicField name="meta_*" type="string" stored="true"
-			indexed="true" />
-
-		<!-- fields for languageidentifier plugin -->
-		<field name="lang" type="string" stored="true" indexed="true" />
-
-		<!-- fields for subcollection plugin -->
-		<field name="subcollection" type="string" stored="true" indexed="true"
-			multiValued="true" />
-
-		<!-- fields for feed plugin (tag is also used by microformats-reltag) -->
-		<field name="author" type="string" stored="true" indexed="true" />
-		<field name="tag" type="string" stored="true" indexed="true"
-			multiValued="true" />
-		<field name="feed" type="string" stored="true" indexed="true" />
-		<field name="publishedDate" type="date" stored="true" indexed="true" />
-		<field name="updatedDate" type="date" stored="true" indexed="true" />
-
-		<!-- fields for creativecommons plugin -->
-		<field name="cc" type="string" stored="true" indexed="true"
-			multiValued="true" />
-
-		<!-- fields for tld plugin -->
-		<field name="tld" type="string" stored="false" indexed="false" />
 
 		<!-- fields for custom -->
+		<field name="position" type="text_cn" stored="true" indexed="true" />
+		<field name="articleTitle" type="text_cn" stored="true" indexed="true" />
+		<field name="articleText" type="text_cn" stored="true" indexed="true" />
+		<field name="publishDate" type="string" stored="true" indexed="true" />
+		<field name="category" type="text_cn" stored="false" indexed="true" />
+		<field name="name" type="text_cn" stored="false" indexed="true" />
 		<field name="pinyin" type="string" stored="false" indexed="true"
 			multiValued="true" />
-		<field name="domain" type="string" stored="true" indexed="true" />
-		<field name="groups" type="string" stored="true" indexed="true"
-			multiValued="true" />
-		<field name="groupUpdatetime" type="string" stored="true"
-			indexed="true" />
-		<field name="keyword" type="text_cn" stored="true" indexed="true" />
-		<field name="price" type="float" stored="true" indexed="true" />
-		<field name="refPrice" type="float" stored="true" indexed="true" />
-		<field name="name" type="text_cn" stored="true" indexed="true" />
-		<field name="brand" type="text_cn" stored="true" indexed="true" />
-		<field name="category" type="string" stored="true" indexed="true" />
-		<field name="purpose" type="text_cn" stored="true" indexed="true" />
-		<field name="primaryImage" type="string" stored="true" indexed="true" />
-
-		<!-- auto suggest字段定义为细化单字的类型 -->
-		<field name="suggest" type="text_cn_detail" indexed="true"
-			stored="false" multiValued="true" />
 	</fields>
 	<uniqueKey>id</uniqueKey>
 	<defaultSearchField>text</defaultSearchField>
@@ -411,12 +363,7 @@
 		or to add multiple fields to the same field for easier/faster searching. -->
 
 	<copyField source="content" dest="text" />
-	<copyField source="url" dest="text" />
-	<copyField source="title" dest="text" />
-	<copyField source="anchor" dest="text" />
-	<copyField source="author" dest="text" />
-
-	<!-- 把所有需要提供auto suggest效果的属性追加到suggest字段 -->
-	<copyField source="name" dest="suggest" />
-	<copyField source="pinyin" dest="suggest" />
+	<copyField source="position" dest="text" />
+	<copyField source="articleTitle" dest="text" />
+	<copyField source="articleText" dest="text" />
 </schema>

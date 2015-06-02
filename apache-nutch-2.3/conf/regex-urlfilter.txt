@@ -73,3 +73,10 @@
 
 #http://www.jumeiglobal.com/deal/ht150122p933681t1.html?from=sr__1_1 -> http://www.jumeiglobal.com/deal/ht150122p933681t1.html
 +^http://www.jumeiglobal.com/deal/.*.html$
+
+##################################################
++^http://www.scjtaq.com/$
++^http://www.scjtaq.com/news/.*.html$
+#+^http://www.scjtaq.com/safe/.*.html$
+#+^http://www.scjtaq.com/law/.*.html$
+#+^http://www.scjtaq.com/driver/.*.html$

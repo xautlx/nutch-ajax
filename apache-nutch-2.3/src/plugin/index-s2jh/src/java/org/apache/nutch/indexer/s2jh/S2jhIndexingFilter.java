@@ -22,9 +22,11 @@ public class S2jhIndexingFilter extends AbstractIndexingFilter {
     public NutchDocument filterInternal(NutchDocument doc, String url, WebPage page) {
         //取解析到的商品名称属性进行拼音转换添加到pinyin属性
         String name = getValueFromPageMetaData(page, INDEX_PROPERTY_PREFIX + "name");
-        Set<String> pinyins = ChineseToPinyinConvertor.toPinyin(name, ChineseToPinyinConvertor.MODE.capital);
-        for (String pinyin : pinyins) {
-            doc.add("pinyin", pinyin);
+        if (StringUtils.isNotBlank(name)) {
+            Set<String> pinyins = ChineseToPinyinConvertor.toPinyin(name, ChineseToPinyinConvertor.MODE.capital);
+            for (String pinyin : pinyins) {
+                doc.add("pinyin", pinyin);
+            }
         }
 
         if (page.getMetadata() != null) {

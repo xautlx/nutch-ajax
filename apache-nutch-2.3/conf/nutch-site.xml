@@ -29,7 +29,7 @@
 
 	<property>
 		<name>fetcher.parse</name>
-		<value>true</value>
+		<value>false</value>
 		<description>If true, fetcher will parse content. NOTE: previous releases would
 			default to true. Since 2.0 this is set
 			to false as a safer default.
@@ -114,7 +114,9 @@
 		<value>jdbc</value>
 		<description>
 			println: Just System.out.println
-			jdbc: Persist to Database by JDBC. MySQL table ddl for example:
+			jdbc: Persist to Database by JDBC. 
+			CREATE DATABASE nutch DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+			MySQL table ddl for example:
 				    CREATE TABLE `crawl_data` (
 				    `url` varchar(255) NOT NULL,
 				    `code` varchar(255) NOT NULL,

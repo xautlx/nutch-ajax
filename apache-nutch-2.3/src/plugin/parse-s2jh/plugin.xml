@@ -40,9 +40,23 @@
               name="HtmlParseFilter"
               point="org.apache.nutch.parse.ParseFilter">
 
+      <implementation id="scjtaqHtmlParseFilter"
+                      class="org.apache.nutch.parse.s2jh.ScjtaqHtmlParseFilter">
+      </implementation>
+
+      <!-- 
       <implementation id="tmallHtmlParseFilter"
                       class="org.apache.nutch.parse.s2jh.TMallHtmlParseFilter">
       </implementation>
 
+      <implementation id="vipHtmlParseFilter"
+                      class="org.apache.nutch.parse.s2jh.VipHtmlParseFilter">
+      </implementation>
+
+      <implementation id="jumeiHtmlParseFilter"
+                      class="org.apache.nutch.parse.s2jh.JumeiHtmlParseFilter">
+      </implementation>
+      -->
+      
    </extension> 
 </plugin>

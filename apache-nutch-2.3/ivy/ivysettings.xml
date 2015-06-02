@@ -74,9 +74,9 @@
      
     <chain name="default" dual="true">
       <resolver ref="local"/>
-      <!-- 如果maven官方资源库访问很慢，可以考虑取消此段注释访问国内镜像
+      <!-- 如果maven官方资源库访问很慢，可以考虑取消此段注释访问国内镜像-->
       <resolver ref="oschina"/>
-      -->
+      
       <resolver ref="maven2"/>
       <resolver ref="restlet"/>
       <resolver ref="sonatype"/>
