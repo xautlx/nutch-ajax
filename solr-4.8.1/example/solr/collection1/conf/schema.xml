@@ -312,6 +312,9 @@
 			</analyzer>
 		</fieldType>
 
+		<fieldType name="text_ik" class="solr.TextField">   
+		     <analyzer class="org.wltea.analyzer.lucene.IKAnalyzer"/>   
+		</fieldType>
 	</types>
 
 	<fields>
@@ -341,16 +344,16 @@
 		<field name="tstamp" type="date" stored="true" indexed="false" />
 
 		<!-- catch-all field -->
-		<field name="text" type="text_cn" stored="false" indexed="true"
+		<field name="text" type="text_ik" stored="false" indexed="true"
 			multiValued="true" />
 
 		<!-- fields for custom -->
-		<field name="position" type="text_cn" stored="true" indexed="true" />
-		<field name="articleTitle" type="text_cn" stored="true" indexed="true" />
-		<field name="articleText" type="text_cn" stored="true" indexed="true" />
+		<field name="position" type="text_ik" stored="true" indexed="true" />
+		<field name="articleTitle" type="text_ik" stored="true" indexed="true" />
+		<field name="articleText" type="text_ik" stored="true" indexed="true" />
 		<field name="publishDate" type="string" stored="true" indexed="true" />
-		<field name="category" type="text_cn" stored="false" indexed="true" />
-		<field name="name" type="text_cn" stored="false" indexed="true" />
+		<field name="category" type="text_ik" stored="false" indexed="true" />
+		<field name="name" type="text_ik" stored="false" indexed="true" />
 		<field name="pinyin" type="string" stored="false" indexed="true"
 			multiValued="true" />
 	</fields>
