@@ -43,6 +43,9 @@
       <implementation id="scjtaqHtmlParseFilter"
                       class="org.apache.nutch.parse.s2jh.ScjtaqHtmlParseFilter">
       </implementation>
+      <implementation id="jtCpdHtmlParseFilter"
+                      class="org.apache.nutch.parse.s2jh.JtCpdHtmlParseFilter">
+      </implementation>
 
       <!-- 
       <implementation id="tmallHtmlParseFilter"

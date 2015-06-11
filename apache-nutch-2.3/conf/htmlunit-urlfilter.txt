@@ -51,10 +51,20 @@
 -^http://eclick.baidu.com
 
 ################## www.scjtaq.com ###################
+-\.js
 -^http://c.cnzz.com
 -^http://m.weather.com.cn
 -^http://hzs16.cnzz.com
 
+################## jt.cpd.com.cn ###################
+-\.js
+-^http://.*#.*
+-^http://jt.cpd.com.cn/template
+-^http://.*.baidu.com/.*
+-^http://.*.baidustatic.com/.*
+-^http://comment.cpd.com.cn
+-^http://www.cpd.com.cn
+-^http://home.cpd.com.cn
 
 # accept anything else
 +.*
