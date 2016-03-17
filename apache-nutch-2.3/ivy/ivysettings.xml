@@ -46,16 +46,16 @@
   <include url="${ivy.default.conf.dir}/ivyconf-local.xml"/>
   <settings defaultResolver="default"/>
   <resolvers>
+    <ibiblio name="oschina"
+      root="${maven.oschina.net}"
+      pattern="${maven2.pattern.ext}"
+      m2compatible="true"
+      />     
     <ibiblio name="maven2"
       root="${repo.maven.org}"
       pattern="${maven2.pattern.ext}"
       m2compatible="true"
-      />
-     <ibiblio name="oschina"
-      root="${maven.oschina.net}"
-      pattern="${maven2.pattern.ext}"
-      m2compatible="true"
-      />       
+      />  
     <ibiblio name="apache-snapshot"
       root="${repository.apache.org}"
       changingPattern=".*-SNAPSHOT"
