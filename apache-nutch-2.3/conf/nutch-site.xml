@@ -65,7 +65,17 @@
 	   confuse this setting with the http.content.limit setting.
 	  </description>
 	</property>
-
+	
+	<property>
+	  <name>fetcher.server.delay</name>
+	  <value>0</value>
+	  <description>The number of seconds the fetcher will delay between 
+	   successive requests to the same server. Note that this might get
+	   overriden by a Crawl-Delay from a robots.txt and is used ONLY if 
+	   fetcher.threads.per.queue is set to 1.
+	   </description>
+	</property>
+  
 	<property>
 		<name>http.agent.name</name>
 		<value>Your Nutch Spider</value>
