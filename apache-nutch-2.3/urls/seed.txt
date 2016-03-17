@@ -1,5 +1,8 @@
-http://jt.cpd.com.cn/
-http://www.scjtaq.com
+http://s.huanqiu.com/s/?q=%E5%A4%A7%E6%95%B0%E6%8D%AE&p=1
+
+#http://jt.cpd.com.cn/
+#http://www.scjtaq.com
+
 #http://apple.tmall.com/category.htm
 #http://detail.tmall.com/item.htm?id=41572748070&rn=3af95d2fec04ec97ca03acd4dbbfde57&abbucket=8
 

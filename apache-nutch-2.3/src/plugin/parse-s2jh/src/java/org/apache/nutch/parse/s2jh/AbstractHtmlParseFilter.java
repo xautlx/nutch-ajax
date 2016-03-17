@@ -54,6 +54,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.gargoylesoftware.htmlunit.Page;
+import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -109,14 +110,35 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
         return this.conf;
     }
 
+    private String convertXPath(String xpath) {
+        String[] paths = xpath.split("/");
+        List<String> convertedPaths = Lists.newArrayList();
+        for (String path : paths) {
+            if ("text()".equalsIgnoreCase(path)) {
+                convertedPaths.add(path.toLowerCase());
+            }
+            if (path.indexOf("[") > -1) {
+                String[] splits = StringUtils.split(path, "[");
+                convertedPaths.add(splits[0].toUpperCase() + "[" + splits[1]);
+            } else {
+                convertedPaths.add(path.toUpperCase());
+            }
+        }
+
+        String convertedPath = StringUtils.join(convertedPaths, "/");
+        LOG.trace("Converted XPath is: {}", convertedPath);
+        return convertedPath;
+    }
+
     /**
      * 基于xpath获取Node列表
      * @param node
      * @param xpath
      * @return
      */
-    protected static NodeList selectNodeList(Node node, String xpath) {
+    protected NodeList selectNodeList(Node node, String xpath) {
         try {
+            xpath = convertXPath(xpath);
             return XPathAPI.selectNodeList(node, xpath);
         } catch (TransformerException e) {
             LOG.warn("Bad 'xpath' expression [{}]", xpath);
@@ -132,6 +154,7 @@ public abstract class AbstractHtmlParseFilter implements ParseFilter {
      */
     protected Node selectSingleNode(Node contextNode, String xpath) {
         try {
+            xpath = convertXPath(xpath);
             return XPathAPI.selectSingleNode(contextNode, xpath);
         } catch (TransformerException e) {
             LOG.warn("Bad 'xpath' expression [{}]", xpath);

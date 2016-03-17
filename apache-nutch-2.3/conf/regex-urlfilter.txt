@@ -84,3 +84,7 @@
 ################# jt.cpd.com.cn ##########################
 +^http://jt.cpd.com.cn/$
 +^http://jt.cpd.com.cn/.*.html$
+
+################# huanqiu.com ##########################
++^http://s.huanqiu.com/s/\?q=%E5%A4%A7%E6%95%B0%E6%8D%AE&p=[0-9]*$
++^http://.*.huanqiu.com/roll/[0-9]{4}-[0-9]{2}/[0-9]*.html$
