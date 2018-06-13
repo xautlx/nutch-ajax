@@ -32,8 +32,8 @@
   <property name="repo.maven.org"
     value="http://repo1.maven.org/maven2/"
     override="false"/>
- <property name="maven.oschina.net"
-    value="http://maven.oschina.net/content/groups/public/"
+ <property name="maven.aliyun.com"
+    value="http://maven.aliyun.com/nexus/content/groups/public/"
     override="false"/>     
   <property name="repository.apache.org"
     value="https://repository.apache.org/content/repositories/snapshots/"
@@ -46,8 +46,8 @@
   <include url="${ivy.default.conf.dir}/ivyconf-local.xml"/>
   <settings defaultResolver="default"/>
   <resolvers>
-    <ibiblio name="oschina"
-      root="${maven.oschina.net}"
+    <ibiblio name="aliyun"
+      root="${maven.aliyun.com}"
       pattern="${maven2.pattern.ext}"
       m2compatible="true"
       />     
@@ -75,7 +75,7 @@
     <chain name="default" dual="true">
       <resolver ref="local"/>
       <!-- 如果maven官方资源库访问很慢，可以考虑取消此段注释访问国内镜像-->
-      <resolver ref="oschina"/>
+      <resolver ref="aliyun"/>
       
       <resolver ref="maven2"/>
       <resolver ref="restlet"/>
@@ -86,7 +86,7 @@
       <resolver ref="local"/>
     </chain>
     <chain name="external">
-      <resolver ref="oschina"/>
+      <resolver ref="aliyun"/>
       <resolver ref="maven2"/>
       <resolver ref="sonatype"/>
     </chain>
